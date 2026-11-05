@@ -239,6 +239,169 @@ await test("page has share tags, contact link, and seal alt text", async (open) 
   assert.ok(loaded > 0, "seal image loads");
 });
 
+const DOOR = "**/functions/v1/door";
+const TICKET = "**/functions/v1/ticket*";
+const PNG = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+
+await test("thanks page explains next steps", async (open) => {
+  const page = await open({ width: 360, height: 640 });
+  await page.goto(`${BASE}/thanks`);
+  await page.getByText("on their way").waitFor();
+  await page.getByText("15 minutes").waitFor();
+  assert.ok(await page.locator('a[href="tel:+18328607467"]').count());
+  assert.equal(await noOverflow(page), true);
+});
+
+await test("ticket page shows QR and literal label", async (open) => {
+  const page = await open({ width: 360, height: 640 });
+  const label = "<b>Jane</b>";
+  await page.route(TICKET, (route) => json(route, { label, kind: "classmate", voided: false, qr_png_base64: PNG }));
+  await page.goto(`${BASE}/ticket?t=x`);
+  await page.getByText(label).waitFor();
+  assert.match(await page.locator("#qr").getAttribute("src"), /^data:image\/png;base64,/);
+  assert.equal(await noOverflow(page), true);
+  await page.screenshot({ path: join(SHOTS, "ticket-360.png") });
+});
+
+await test("voided ticket says no longer valid and hides QR", async (open) => {
+  const page = await open();
+  await page.route(TICKET, (route) => json(route, { label: "Jane", kind: "classmate", voided: true, qr_png_base64: PNG }));
+  await page.goto(`${BASE}/ticket?t=x`);
+  await page.getByText("no longer valid").waitFor();
+  assert.equal(await page.locator("#qr").isVisible(), false);
+});
+
+await test("unknown ticket shows not found and contact", async (open) => {
+  const page = await open();
+  await page.route(TICKET, (route) => json(route, { error: "Ticket not found." }, 404));
+  await page.goto(`${BASE}/ticket?t=bad`);
+  await page.getByText("not found").waitFor();
+  await page.getByText("832-860-7467").first().waitFor();
+});
+
+await test("thanks, ticket, and door pages are not indexed or linked", async (open) => {
+  const page = await open();
+  for (const path of ["thanks", "ticket", "door"]) {
+    await page.route(TICKET, (route) => json(route, { error: "Ticket not found." }, 404));
+    await page.goto(`${BASE}/${path}`);
+    assert.equal(await page.locator('meta[name="robots"]').getAttribute("content"), "noindex");
+  }
+  await page.goto(BASE);
+  const linked = await page.locator("a").evaluateAll((links) => links.map((a) => new URL(a.href).pathname));
+  for (const path of ["/thanks", "/ticket", "/door"]) {
+    assert.equal(linked.includes(path), false, path);
+  }
+});
+
+async function openDoor(open, scanResponse, options = {}) {
+  const page = await open({ width: 360, height: 640, ...options });
+  const posts = [];
+  await page.route(DOOR, (route) => {
+    const body = route.request().postDataJSON();
+    posts.push(body);
+    if (body.password !== "right") return json(route, { error: "Wrong password." }, 401);
+    if (body.action === "login") return json(route, { ok: true });
+    if (body.action === "search") {
+      return json(route, {
+        matches: [
+          { token: "tok-1", label: "<i>Jane</i>", kind: "classmate", voided: false, checked_in_at: null },
+          { token: "tok-2", label: "Guest of Jane", kind: "guest", voided: false, checked_in_at: "2026-11-29T01:42:00Z" },
+        ],
+      });
+    }
+    return json(route, scanResponse);
+  });
+  await page.goto(`${BASE}/door`);
+  return { page, posts };
+}
+
+async function login(page) {
+  await page.getByLabel("Door password").fill("right");
+  await page.getByRole("button", { name: "Open check-in" }).click();
+  await page.getByLabel("Find by name").waitFor();
+}
+
+async function checkInFromSearch(page) {
+  await page.getByLabel("Find by name").fill("jane");
+  await page.getByRole("button", { name: "Search" }).click();
+  await page.getByRole("button", { name: "Check in" }).first().click();
+}
+
+await test("door requires password and shows error", async (open) => {
+  const { page } = await openDoor(open, {});
+  assert.equal(await page.getByLabel("Find by name").isVisible(), false);
+  await page.getByLabel("Door password").fill("wrong");
+  await page.getByRole("button", { name: "Open check-in" }).click();
+  await page.getByText("Wrong password.").waitFor();
+});
+
+await test("door search renders names literally and marks checked-in tickets", async (open) => {
+  const { page } = await openDoor(open, {});
+  await login(page);
+  await page.getByLabel("Find by name").fill("jane");
+  await page.getByRole("button", { name: "Search" }).click();
+  await page.getByText("<i>Jane</i>").waitFor();
+  await page.getByText("Checked in 7:42 PM").waitFor();
+  assert.equal(await page.getByRole("button", { name: "Check in" }).count(), 1);
+  await page.screenshot({ path: join(SHOTS, "door-search-360.png") });
+  assert.equal(await noOverflow(page), true);
+});
+
+await test("door success is green with label, and posts the ticket token", async (open) => {
+  const { page, posts } = await openDoor(open, { result: "ok", label: "Jane Doe", kind: "classmate", checked_in_at: "2026-11-29T01:42:00Z" });
+  await login(page);
+  await checkInFromSearch(page);
+  const result = page.locator("#result");
+  await result.getByText("Jane Doe").waitFor();
+  assert.equal(await result.getAttribute("data-state"), "good");
+  const scan = posts.find((p) => p.action === "scan");
+  assert.equal(scan.scanned, "tok-1");
+  await page.screenshot({ path: join(SHOTS, "door-ok-360.png") });
+  await page.getByRole("button", { name: "Next" }).click();
+  assert.equal(await result.isVisible(), false);
+});
+
+await test("door repeat scan is red with Central time", async (open) => {
+  const { page } = await openDoor(open, { result: "already", label: "Jane Doe", kind: "classmate", checked_in_at: "2026-11-29T01:42:00Z" });
+  await login(page);
+  await checkInFromSearch(page);
+  const result = page.locator("#result");
+  await result.getByText("Already checked in at 7:42 PM").waitFor();
+  assert.equal(await result.getAttribute("data-state"), "bad");
+  await page.screenshot({ path: join(SHOTS, "door-already-360.png") });
+});
+
+await test("door voided and not-found results are red", async (open) => {
+  for (const [response, text] of [
+    [{ result: "voided", label: "Jane", kind: "classmate" }, "Refunded or voided"],
+    [{ result: "not_found" }, "Not found"],
+  ]) {
+    const { page } = await openDoor(open, response);
+    await login(page);
+    await checkInFromSearch(page);
+    await page.locator("#result").getByText(text).waitFor();
+    assert.equal(await page.locator("#result").getAttribute("data-state"), "bad");
+  }
+});
+
+await test("door keeps name search usable when camera is unavailable", async (open) => {
+  const { page } = await openDoor(open, {});
+  await login(page);
+  await page.getByText("Camera unavailable").waitFor();
+  assert.equal(await page.getByLabel("Find by name").isVisible(), true);
+});
+
+await test("door network failure points staff to printed list", async (open) => {
+  const { page } = await openDoor(open, {});
+  await login(page);
+  await page.unroute(DOOR);
+  await page.route(DOOR, (route) => route.abort());
+  await page.getByLabel("Find by name").fill("jane");
+  await page.getByRole("button", { name: "Search" }).click();
+  await page.getByText("printed list").waitFor();
+  assert.deepEqual(page.errors, []);
+});
+
 await browser.close();
 server.close();
 if (failures) {

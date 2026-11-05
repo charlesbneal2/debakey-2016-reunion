@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Door Check-In | DeBakey Reunion</title>
+  <link rel="icon" href="assets/favicon.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="door">
+  <form id="login" class="panel door-panel">
+    <h1>Door check-in</h1>
+    <label class="field" for="password">Door password
+      <input id="password" type="password" autocomplete="current-password" required>
+    </label>
+    <button class="button" type="submit">Open check-in</button>
+    <p id="login-status" class="form-status" role="alert"></p>
+  </form>
+
+  <main id="desk" class="door-desk" hidden>
+    <h1>Check-in</h1>
+    <div id="reader" class="reader"></div>
+    <p id="camera-status" class="muted" role="status"></p>
+
+    <form id="search" class="door-search">
+      <label class="field" for="query">Find by name
+        <input id="query" type="search" autocomplete="off">
+      </label>
+      <button class="button" type="submit">Search</button>
+    </form>
+    <p id="search-status" class="form-status" role="alert"></p>
+    <ul id="matches" class="matches"></ul>
+  </main>
+
+  <div id="result" class="result" role="alert" hidden>
+    <p id="result-title" class="result-title"></p>
+    <p id="result-label" class="result-label"></p>
+    <button id="next" class="button button-light" type="button">Next</button>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="vendor/html5-qrcode.min.js"></script>
+  <script src="door.js"></script>
+</body>
+</html>
