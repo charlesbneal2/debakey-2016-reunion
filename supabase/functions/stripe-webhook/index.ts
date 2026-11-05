@@ -1,7 +1,6 @@
-import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 import { json } from "../_shared/http.ts";
-import { createStore } from "../_shared/store.ts";
+import { liveStore } from "../_shared/live_store.ts";
 import type { TicketEmail } from "../_shared/tickets.ts";
 import { handleStripeEvent } from "./handler.ts";
 
@@ -36,12 +35,7 @@ if (import.meta.main) {
   const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
     httpClient: Stripe.createFetchHttpClient(),
   });
-  const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-  const store = createStore(async (fn, args) => {
-    const { data, error } = await supabase.rpc(fn, args);
-    if (error) throw error;
-    return data;
-  });
+  const store = liveStore();
 
   Deno.serve(async (req) => {
     const rawBody = await req.text();
