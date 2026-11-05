@@ -10,7 +10,7 @@ Do these in order. Stripe details are in `docs/stripe-setup.md`; do its steps 1-
    ```bash
    npx supabase login
    npx supabase link --project-ref YOUR_PROJECT_REF
-   npx supabase db push
+   npx supabase db push --remote
    ```
 
 3. Put the reference into `site/config.js`, replacing `PROJECT_REF`, then commit.
@@ -40,7 +40,7 @@ npx supabase secrets set \
   REPLY_TO_EMAIL=you@example.com \
   SITE_URL=https://debakey2016reunion.com
 
-npx supabase functions deploy
+npx supabase functions deploy --use-api
 npx supabase functions list
 ```
 
@@ -106,7 +106,7 @@ Phone camera scanning needs HTTPS, so run this against the deployed site. Every 
 - [ ] Venue address and map link, in the same files as the time
 - [ ] Clean logo file, if available
 - [ ] Yearbook material, if ready
-- [ ] Commit and push site changes, then run `npx supabase functions deploy` so ticket emails and sales closing match the site. Pushing updates only the site, never the functions.
+- [ ] Commit and push site changes, then run `npx supabase functions deploy --use-api` so ticket emails and sales closing match the site. Pushing updates only the site, never the functions.
 - [ ] Clear test data in the Supabase SQL editor. **This permanently deletes every order and ticket, so run it only before real sales begin:**
 
   ```sql
