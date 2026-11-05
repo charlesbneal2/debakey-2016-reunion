@@ -13,6 +13,19 @@ export type CheckoutParams = {
   };
 };
 
+export function buildSessionParams(params: CheckoutParams, price: string) {
+  const { guest_name, ...metadata } = params.metadata;
+  return {
+    mode: "payment" as const,
+    // Cards only: delayed bank payments could leave a buyer without a ticket on event night.
+    payment_method_types: ["card" as const],
+    line_items: [{ price, quantity: params.quantity }],
+    success_url: params.successUrl,
+    cancel_url: params.cancelUrl,
+    metadata: (guest_name ? { ...metadata, guest_name } : metadata) as Record<string, string>,
+  };
+}
+
 export async function handleCheckout(
   req: Request,
   deps: {

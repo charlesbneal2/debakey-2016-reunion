@@ -40,6 +40,8 @@ async function loadGuests() {
 async function startCheckout() {
   submit.disabled = true;
   status.textContent = "";
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
   try {
     const response = await fetch(`${window.FUNCTIONS_URL}/create-checkout`, {
       method: "POST",
@@ -50,7 +52,7 @@ async function startCheckout() {
         with_guest: withGuest(),
         show_on_list: document.getElementById("show-on-list").checked,
       }),
-      signal: AbortSignal.timeout(20000),
+      signal: controller.signal,
     });
     const data = await response.json();
     if (response.ok && data.url) {
@@ -65,6 +67,7 @@ async function startCheckout() {
   } catch {
     status.textContent = `We couldn't reach the ticket system. ${HELP}`;
   }
+  clearTimeout(timeout);
   submit.disabled = false;
 }
 

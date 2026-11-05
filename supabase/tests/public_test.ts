@@ -1,8 +1,8 @@
 import { assert, assertEquals } from "@std/assert";
 import { newDb, orderArgs } from "./helpers.ts";
 import { createStore } from "../functions/_shared/store.ts";
-import { handleGuestList } from "../functions/guest-list/index.ts";
-import { handleTicket } from "../functions/ticket/index.ts";
+import { handleGuestList } from "../functions/guest-list/handler.ts";
+import { handleTicket } from "../functions/ticket/handler.ts";
 
 const SITE = "https://debakey2016reunion.com";
 

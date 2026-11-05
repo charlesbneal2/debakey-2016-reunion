@@ -1,3 +1,4 @@
+import Stripe from "npm:stripe@17";
 import { json } from "../_shared/http.ts";
 import type { Store } from "../_shared/store.ts";
 import { buildTicketEmail, newToken, type TicketEmail } from "../_shared/tickets.ts";
@@ -7,6 +8,16 @@ type Deps = {
   siteUrl: string;
   sendEmail(to: string, email: TicketEmail): Promise<void>;
 };
+
+export function verifyEvent(rawBody: string, signature: string, secret: string, stripe: Stripe) {
+  return stripe.webhooks.constructEventAsync(
+    rawBody,
+    signature,
+    secret,
+    undefined,
+    Stripe.createSubtleCryptoProvider(),
+  );
+}
 
 // deno-lint-ignore no-explicit-any
 async function issueTickets(session: any, deps: Deps) {

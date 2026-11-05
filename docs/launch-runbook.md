@@ -1,6 +1,6 @@
 # Launch Runbook
 
-Do these in order. Stripe details are in `docs/stripe-setup.md`.
+Do these in order. Stripe details are in `docs/stripe-setup.md`; do its steps 1-5 when step 3 below tells you to.
 
 ## 1. Supabase
 
@@ -13,7 +13,8 @@ Do these in order. Stripe details are in `docs/stripe-setup.md`.
    npx supabase db push
    ```
 
-3. Put the reference into `site/config.js`, replacing `PROJECT_REF`.
+3. Put the reference into `site/config.js`, replacing `PROJECT_REF`, then commit.
+4. Confirm the project's API settings still offer a `service_role` key, since the functions rely on `SUPABASE_SERVICE_ROLE_KEY`.
 
 ## 2. Resend (ticket email)
 
@@ -25,7 +26,9 @@ Do these in order. Stripe details are in `docs/stripe-setup.md`.
 
 ## 3. Secrets and functions
 
-Choose a door password that's long but easy to type on a phone.
+First do `docs/stripe-setup.md` steps 1-5 to get your Stripe values.
+
+Generate the door password with `openssl rand -hex 8`. Send it to door staff privately so they can paste it. Don't use a short or guessable password, because it unlocks every ticket.
 
 ```bash
 npx supabase secrets set \
@@ -33,7 +36,7 @@ npx supabase secrets set \
   STRIPE_WEBHOOK_SECRET=whsec_... \
   STRIPE_PRICE_ID=price_... \
   RESEND_API_KEY=re_... \
-  DOOR_PASSWORD='choose-a-password' \
+  DOOR_PASSWORD='YOUR_GENERATED_PASSWORD' \
   REPLY_TO_EMAIL=you@example.com \
   SITE_URL=https://debakey2016reunion.com
 
@@ -43,12 +46,19 @@ npx supabase functions list
 
 The list must show `create-checkout`, `stripe-webhook`, `guest-list`, `ticket`, and `door`.
 
+Smoke test before going further. This must print `{"guests":[]}`:
+
+```bash
+curl https://YOUR_PROJECT_REF.supabase.co/functions/v1/guest-list
+```
+
 ## 4. GitHub Pages and domain
 
-1. Merge the site to `master`. On a free GitHub plan, Pages needs a public repo, so check that no secrets are committed.
+1. On a free GitHub plan, Pages needs a public repo, so check that no secrets are committed.
 2. In the repo, open **Settings > Pages** and set **Source** to **GitHub Actions**.
-3. Under **Custom domain**, enter `debakey2016reunion.com` and save.
-4. In Porkbun DNS, delete any default parking records for the apex and `www`, then add:
+3. Merge the site to `master`. Check the **Actions** tab shows **Deploy site** passing; if not, run it from there.
+4. Under **Custom domain**, enter `debakey2016reunion.com` and save.
+5. In Porkbun DNS, delete any default parking records for the apex and `www`, then add:
 
    | Type | Host | Answer |
    | --- | --- | --- |
@@ -58,8 +68,8 @@ The list must show `create-checkout`, `stripe-webhook`, `guest-list`, `ticket`, 
    | A | (blank) | `185.199.111.153` |
    | CNAME | `www` | `charlesbneal2.github.io` |
 
-5. When the DNS check passes, turn on **Enforce HTTPS**. The certificate can take a little while.
-6. Run the **Keep Supabase awake** workflow once from the **Actions** tab and confirm it passes.
+6. When the DNS check passes, turn on **Enforce HTTPS**. The certificate can take a little while.
+7. Run the **Keep Supabase awake** workflow once from the **Actions** tab and confirm it passes.
 
 The page is now public, but it only takes test cards until you switch Stripe to live. Don't share the link yet.
 
@@ -78,6 +88,14 @@ Phone camera scanning needs HTTPS, so run this against the deployed site. Every 
 - [ ] Find a ticket with name search.
 - [ ] Refund the payment in full in Stripe. Your name leaves the list, and scanning shows "Refunded or voided".
 - [ ] Try a declined card: `4000 0000 0000 9995`. No tickets or email.
+- [ ] Buy **Just me** with a name containing HTML and emoji, such as `<b>Jo</b> 🎉`. It displays literally in the email, list, and door.
+- [ ] Practice the mistyped-email fix below. The same QR codes arrive at the new address.
+- [ ] Send a forged door request, then check **Edge Functions > door > Logs** or `door_failures` to see which IP was recorded. If the forged value was recorded, password limiting can be bypassed, so fix that before launch:
+
+  ```bash
+  curl -X POST https://YOUR_PROJECT_REF.supabase.co/functions/v1/door \
+    -H 'x-forwarded-for: 203.0.113.99' -d '{"password":"wrong","action":"login"}'
+  ```
 
 ## 6. Before opening sales
 
@@ -85,9 +103,10 @@ Phone camera scanning needs HTTPS, so run this against the deployed site. Every 
 - [ ] Sales closing time, if the end time changes, in `site/app.js` and `supabase/functions/_shared/rules.ts`
 - [ ] Confirm the ticket covers entry only
 - [ ] Mourad agrees to the public phone number
-- [ ] Venue address and map link
+- [ ] Venue address and map link, in the same files as the time
 - [ ] Clean logo file, if available
 - [ ] Yearbook material, if ready
+- [ ] Commit and push site changes, then run `npx supabase functions deploy` so ticket emails and sales closing match the site. Pushing updates only the site, never the functions.
 - [ ] Clear test data in the Supabase SQL editor. **This permanently deletes every order and ticket, so run it only before real sales begin:**
 
   ```sql

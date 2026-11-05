@@ -1,7 +1,7 @@
 import { assertEquals } from "@std/assert";
 import { newDb, orderArgs, type Rpc } from "./helpers.ts";
 import { createStore } from "../functions/_shared/store.ts";
-import { extractToken, handleDoor } from "../functions/door/index.ts";
+import { extractToken, handleDoor } from "../functions/door/handler.ts";
 
 const SITE = "https://debakey2016reunion.com";
 const PASSWORD = "door-secret";

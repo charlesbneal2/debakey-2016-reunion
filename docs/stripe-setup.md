@@ -11,7 +11,7 @@ Stripe changes its dashboard labels from time to time. If a label differs from t
 - Legal name, date of birth, home address, and the last four digits or full Social Security number
 - A bank account for payouts
 - A support email and phone number that buyers can see
-- A privacy policy URL, which Stripe requires for automatic receipts (see step 4)
+- A support address and email for your receipts. The privacy policy is already on the site.
 
 ## 1. Create your account
 
@@ -30,7 +30,7 @@ Do this in test mode now. You'll repeat it in live mode in step 8.
 3. Set **One-off** pricing, **$20.00 USD**.
 4. Save, open the product, and copy the **Price ID**. It starts with `price_`, not `prod_`.
 
-Your site asks Stripe for quantity 1 or 2, so a +1 comes to $40 automatically. Don't create a second price.
+Your site asks Stripe for quantity 1 or 2, so a +1 comes to $40 automatically. Don't create a second price. The site accepts cards only, which includes Apple Pay and Google Pay where available, so tickets go out right after payment.
 
 ## 3. Copy your test API key
 
@@ -46,13 +46,13 @@ Your site asks Stripe for quantity 1 or 2, so a +1 comes to $40 automatically. D
    - Public business name, such as `DeBakey Class of 2016 Reunion`
    - Statement descriptor: `DEBAKEY REUNION`, which is what appears on card statements
    - Customer support email, phone, and address
-   - Privacy policy URL
+   - Privacy policy URL: `https://debakey2016reunion.com/privacy`
 
 Stripe says receipts must carry a legal business name, support address, support email, and privacy policy URL.
 
 ## 5. Add the webhook
 
-The webhook is how Stripe tells your site that someone paid. Without it, buyers get no tickets. You need your Supabase project reference for this step (see the runbook).
+The webhook is how Stripe tells your site that someone paid. Without it, buyers get no tickets. You need your Supabase project reference for this step, so do step 1 of `docs/launch-runbook.md` first.
 
 1. Open [Webhooks in Workbench](https://dashboard.stripe.com/webhooks) and click **Create an event destination**.
 2. Select **Your account**.

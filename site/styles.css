@@ -215,6 +215,11 @@ legend { font-weight: 700; margin-bottom: 10px; padding: 0; }
 .event-line { font-weight: 700; }
 .qr { display: block; height: auto; margin: 16px auto; max-width: 100%; }
 
+/* Privacy */
+.prose h1 { color: var(--navy); font-size: clamp(1.8rem, 6vw, 2.4rem); margin-bottom: 18px; }
+.prose h2 { font-size: 1.15rem; margin-top: 28px; }
+.prose p { margin: 10px 0; }
+
 /* Door check-in */
 .door { background: var(--mist); min-height: 100svh; }
 .door-panel { display: grid; gap: 18px; margin: 32px auto; text-align: left; width: calc(100% - 32px); }

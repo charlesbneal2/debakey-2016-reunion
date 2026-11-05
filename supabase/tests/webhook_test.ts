@@ -3,8 +3,7 @@ import Stripe from "npm:stripe@17";
 import { newDb } from "./helpers.ts";
 import { createStore } from "../functions/_shared/store.ts";
 import type { TicketEmail } from "../functions/_shared/tickets.ts";
-import { handleStripeEvent } from "../functions/stripe-webhook/handler.ts";
-import { verifyEvent } from "../functions/stripe-webhook/index.ts";
+import { handleStripeEvent, verifyEvent } from "../functions/stripe-webhook/handler.ts";
 
 const SITE = "https://debakey2016reunion.com";
 

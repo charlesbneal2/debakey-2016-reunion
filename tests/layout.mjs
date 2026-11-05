@@ -239,6 +239,30 @@ await test("page has share tags, contact link, and seal alt text", async (open) 
   assert.ok(loaded > 0, "seal image loads");
 });
 
+await test("checkout works on browsers without AbortSignal.timeout", async (open) => {
+  const page = await open();
+  await page.addInitScript(() => {
+    delete AbortSignal.timeout;
+  });
+  await page.route("**/create-checkout", (route) => json(route, { url: `${BASE}/stripe-mock` }));
+  await page.goto(BASE);
+  await page.getByLabel("Your name").fill("Jane Doe");
+  await page.getByRole("button", { name: "Continue to payment" }).click();
+  await page.waitForURL("**/stripe-mock");
+});
+
+await test("privacy page is linked and says what is collected and who to contact", async (open) => {
+  const page = await open({ width: 360, height: 640 });
+  await page.goto(BASE);
+  await page.locator("#questions").getByRole("link", { name: "Privacy" }).click();
+  await page.waitForURL("**/privacy");
+  await page.getByRole("heading", { name: "Privacy" }).waitFor();
+  for (const text of ["name", "email", "Stripe", "832-860-7467"]) {
+    await page.locator("main").getByText(text).first().waitFor();
+  }
+  assert.equal(await noOverflow(page), true);
+});
+
 const DOOR = "**/functions/v1/door";
 const TICKET = "**/functions/v1/ticket*";
 const PNG = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";

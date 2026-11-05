@@ -1,7 +1,7 @@
 import { assertEquals, assertStringIncludes } from "@std/assert";
 import { parseOrderForm, SALES_CLOSE } from "../functions/_shared/rules.ts";
 import { corsHeaders } from "../functions/_shared/http.ts";
-import { type CheckoutParams, handleCheckout } from "../functions/create-checkout/handler.ts";
+import { buildSessionParams, type CheckoutParams, handleCheckout } from "../functions/create-checkout/handler.ts";
 
 const SITE = "https://debakey2016reunion.com";
 
@@ -122,4 +122,29 @@ Deno.test("OPTIONS returns 204 with CORS headers; GET returns 405", async () => 
   assertEquals(options.headers.get("access-control-allow-origin"), SITE);
   const get = await handleCheckout(new Request("https://fn.test/", { headers: { origin: SITE } }), deps());
   assertEquals(get.status, 405);
+});
+
+const checkoutParams = (guest_name: string): CheckoutParams => ({
+  quantity: guest_name ? 2 : 1,
+  successUrl: `${SITE}/thanks`,
+  cancelUrl: `${SITE}/#tickets`,
+  metadata: { name: "Jane", guest_name, with_guest: guest_name ? "true" : "false", show_on_list: "false" },
+});
+
+Deno.test("session takes instant card payments only, so tickets are never delayed", () => {
+  const session = buildSessionParams(checkoutParams(""), "price_1");
+  assertEquals(session.payment_method_types, ["card"]);
+  assertEquals(session.mode, "payment");
+  assertEquals(session.line_items, [{ price: "price_1", quantity: 1 }]);
+  assertEquals(session.success_url, `${SITE}/thanks`);
+  assertEquals(session.cancel_url, `${SITE}/#tickets`);
+});
+
+Deno.test("session metadata omits empty guest name and keeps a real one", () => {
+  assertEquals(buildSessionParams(checkoutParams(""), "price_1").metadata, {
+    name: "Jane",
+    with_guest: "false",
+    show_on_list: "false",
+  });
+  assertEquals(buildSessionParams(checkoutParams("Sam"), "price_1").metadata?.guest_name, "Sam");
 });
