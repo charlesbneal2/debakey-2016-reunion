@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DeBakey Class of 2016 Ten-Year Reunion</title>
+  <meta name="description" content="Saturday, November 28, 2026 at Bad Astronaut in Houston. Tickets are $20.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://debakey2016reunion.com/">
+  <meta property="og:title" content="DeBakey Class of 2016 Ten-Year Reunion">
+  <meta property="og:description" content="Saturday, November 28, 2026 at Bad Astronaut in Houston. Tickets are $20.">
+  <meta property="og:image" content="https://debakey2016reunion.com/assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header id="cover" class="cover">
+    <div class="cover-inner">
+      <p class="kicker">Class of 2016 &middot; Ten Years</p>
+      <img class="seal" src="assets/seal.png" width="512" height="512" alt="Michael E. DeBakey High School for Health Professions seal">
+      <h1>The Ten-Year Reunion</h1>
+      <p class="school">DeBakey High School for Health Professions</p>
+      <p class="facts">
+        <span>Saturday, November 28, 2026 &middot; 7&ndash;10 PM</span><br>
+        <span>Bad Astronaut &middot; Houston, TX</span>
+      </p>
+      <a id="cover-cta" class="button button-light" href="#tickets">Get Tickets &middot; $20</a>
+      <p id="cover-closed" class="closed-note" hidden>Ticket sales have closed.</p>
+      <p class="cover-contact">Questions? Mourad Berrached &middot; <a href="tel:+18328607467">832-860-7467</a></p>
+    </div>
+  </header>
+
+  <main>
+    <!--
+      Yearbook section. Remove the `hidden` attribute once at least one slot is filled in.
+      Uncomment and copy a slot below for each item. Put images in site/assets/.
+    -->
+    <section id="yearbook" class="section yearbook" aria-labelledby="yearbook-title" hidden>
+      <div class="wrap">
+        <p class="eyebrow">From the yearbook</p>
+        <h2 id="yearbook-title">Remember when</h2>
+        <div class="spread">
+          <!-- PHOTO SLOT
+          <figure class="spread-photo">
+            <img src="assets/PHOTO.jpg" alt="DESCRIBE THE PHOTO">
+            <figcaption>CAPTION</figcaption>
+          </figure>
+          -->
+          <!-- QUOTE SLOT
+          <blockquote class="spread-quote">
+            <p>QUOTE</p>
+            <cite>WHO SAID IT</cite>
+          </blockquote>
+          -->
+          <!-- MEMORY SLOT
+          <article class="spread-memory">
+            <h3>TITLE</h3>
+            <p>THE MEMORY</p>
+          </article>
+          -->
+        </div>
+      </div>
+    </section>
+
+    <section id="guests" class="section guests" aria-labelledby="guests-title" hidden>
+      <div class="wrap">
+        <p class="eyebrow">The roster</p>
+        <h2 id="guests-title">Who's coming</h2>
+        <ul id="guest-list" class="roster"></ul>
+        <p id="guest-empty" class="muted" hidden>Be the first on the list.</p>
+      </div>
+    </section>
+
+    <section id="tickets" class="section tickets" aria-labelledby="tickets-title">
+      <div class="wrap wrap-narrow">
+        <p class="eyebrow">Admission</p>
+        <h2 id="tickets-title">Get your tickets</h2>
+        <p class="muted">Tickets are $20 each. We'll email a QR code for each person to show at the door.</p>
+
+        <form id="ticket-form" class="ticket-form" novalidate>
+          <fieldset>
+            <legend>Who's coming with you?</legend>
+            <label class="choice"><input type="radio" name="party" value="solo" checked> <span>Just me, $20</span></label>
+            <label class="choice"><input type="radio" name="party" value="guest"> <span>Me + guest, $40</span></label>
+          </fieldset>
+
+          <label class="field" for="name">Your name
+            <input id="name" name="name" type="text" maxlength="80" autocomplete="name" required>
+          </label>
+
+          <label class="field" id="guest-field" for="guest-name" hidden>Guest's name <small>(optional)</small>
+            <input id="guest-name" name="guest_name" type="text" maxlength="80" autocomplete="off">
+          </label>
+
+          <label class="check"><input id="show-on-list" type="checkbox"> <span>Show my name on the list</span></label>
+
+          <button id="submit" class="button" type="submit">Continue to payment</button>
+          <p class="fine">Secure payment by Stripe. You'll enter your email and card on the next page.</p>
+          <p id="form-status" class="form-status" role="alert"></p>
+        </form>
+
+        <p id="sales-closed" class="sales-closed" hidden>Ticket sales have closed.</p>
+        <noscript><p class="form-status">Tickets need JavaScript. Call Mourad at 832-860-7467 for help.</p></noscript>
+      </div>
+    </section>
+  </main>
+
+  <footer id="questions" class="questions">
+    <div class="wrap">
+      <h2>Questions?</h2>
+      <p>Call <a href="tel:+18328607467">Mourad Berrached at 832-860-7467</a>.</p>
+      <p>Your ticket covers entry.</p>
+      <p><a href="https://www.google.com/maps/search/?api=1&amp;query=Bad+Astronaut+Houston+TX" target="_blank" rel="noopener">Find Bad Astronaut on the map</a></p>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
