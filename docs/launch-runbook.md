@@ -38,7 +38,7 @@ npx supabase secrets set \
   RESEND_API_KEY=re_... \
   DOOR_PASSWORD='YOUR_GENERATED_PASSWORD' \
   REPLY_TO_EMAIL=you@example.com \
-  SITE_URL=https://debakey2016reunion.com
+  SITE_URL=http://localhost:8000
 
 npx supabase functions deploy --use-api
 npx supabase functions list
@@ -52,7 +52,41 @@ Smoke test before going further. This must print `{"guests":[]}`:
 curl https://YOUR_PROJECT_REF.supabase.co/functions/v1/guest-list
 ```
 
-## 4. GitHub Pages and domain
+## 4. Rehearse locally with test keys
+
+The site runs on your computer and talks to the deployed functions. Nothing public changes. Start it from the project folder and leave it running:
+
+```bash
+cd site && npx serve@14 -l 8000
+```
+
+Open http://localhost:8000 in your Windows browser. Every item must pass.
+
+- [ ] Buy **Me + guest** with card `4242 4242 4242 4242`, using an inbox you can check, with the name on the list.
+- [ ] Thanks page appears; one email arrives with **two** QR codes.
+- [ ] QR codes display in Gmail and iPhone Mail. Links open each ticket page while the local site is running.
+- [ ] Your name appears under Who's coming with `+1`, after up to a minute.
+- [ ] In Stripe, open the `checkout.session.completed` event and click **Resend**. No second email; no new tickets.
+- [ ] Open http://localhost:8000/door on the computer, then allow the camera. Browsers allow camera use on `localhost` without HTTPS.
+- [ ] Hold the email up to the webcam on your phone and scan both codes: green, showing the right names.
+- [ ] Scan one again: red, "Already checked in".
+- [ ] Find a ticket with name search.
+- [ ] Refund the payment in full in Stripe. Your name leaves the list, and scanning shows "Refunded or voided".
+- [ ] Try a declined card: `4000 0000 0000 9995`. No tickets or email.
+- [ ] Buy **Just me** with a name containing HTML and emoji, such as `<b>Jo</b> 🎉`. It displays literally in the email, list, and door.
+- [ ] Practice the mistyped-email fix below. The same QR codes arrive at the new address.
+- [ ] Send a forged door request, then check **Edge Functions > door > Logs** or `door_failures` to see which IP was recorded. If the forged value was recorded, password limiting can be bypassed, so fix that before launch:
+
+  ```bash
+  curl -X POST https://YOUR_PROJECT_REF.supabase.co/functions/v1/door \
+    -H 'x-forwarded-for: 203.0.113.99' -d '{"password":"wrong","action":"login"}'
+  ```
+
+Phone cameras need HTTPS, so section 5 repeats the scan on a real phone after deployment.
+
+## 5. GitHub Pages and domain
+
+Do this only after section 4 passes.
 
 1. On a free GitHub plan, Pages needs a public repo, so check that no secrets are committed.
 2. In the repo, open **Settings > Pages** and set **Source** to **GitHub Actions**.
@@ -71,31 +105,15 @@ curl https://YOUR_PROJECT_REF.supabase.co/functions/v1/guest-list
 6. When the DNS check passes, turn on **Enforce HTTPS**. The certificate can take a little while.
 7. Run the **Keep Supabase awake** workflow once from the **Actions** tab and confirm it passes.
 
+8. Point the functions at the real site. Secrets take effect without a redeploy:
+
+   ```bash
+   npx supabase secrets set SITE_URL=https://debakey2016reunion.com
+   ```
+
+9. Buy one more test ticket on the real domain. Open `https://debakey2016reunion.com/door` on a phone, allow the camera, and scan it.
+
 The page is now public, but it only takes test cards until you switch Stripe to live. Don't share the link yet.
-
-## 5. Rehearse with test keys
-
-Phone camera scanning needs HTTPS, so run this against the deployed site. Every item must pass.
-
-- [ ] Buy **Me + guest** with card `4242 4242 4242 4242`, using an inbox you can check, with the name on the list.
-- [ ] Thanks page appears; one email arrives with **two** QR codes.
-- [ ] QR codes display in Gmail and iPhone Mail. Links open each ticket page.
-- [ ] Your name appears under Who's coming with `+1`, after up to a minute.
-- [ ] In Stripe, open the `checkout.session.completed` event and click **Resend**. No second email; no new tickets.
-- [ ] Open `https://debakey2016reunion.com/door` on a phone, then allow the camera.
-- [ ] Scan both codes: green, showing the right names.
-- [ ] Scan one again: red, "Already checked in".
-- [ ] Find a ticket with name search.
-- [ ] Refund the payment in full in Stripe. Your name leaves the list, and scanning shows "Refunded or voided".
-- [ ] Try a declined card: `4000 0000 0000 9995`. No tickets or email.
-- [ ] Buy **Just me** with a name containing HTML and emoji, such as `<b>Jo</b> 🎉`. It displays literally in the email, list, and door.
-- [ ] Practice the mistyped-email fix below. The same QR codes arrive at the new address.
-- [ ] Send a forged door request, then check **Edge Functions > door > Logs** or `door_failures` to see which IP was recorded. If the forged value was recorded, password limiting can be bypassed, so fix that before launch:
-
-  ```bash
-  curl -X POST https://YOUR_PROJECT_REF.supabase.co/functions/v1/door \
-    -H 'x-forwarded-for: 203.0.113.99' -d '{"password":"wrong","action":"login"}'
-  ```
 
 ## 6. Before opening sales
 
