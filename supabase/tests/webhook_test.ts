@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
-import Stripe from "stripe";
+import Stripe from "npm:stripe@17";
 import { newDb } from "./helpers.ts";
 import { createStore } from "../functions/_shared/store.ts";
 import type { TicketEmail } from "../functions/_shared/tickets.ts";

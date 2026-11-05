@@ -1,4 +1,4 @@
-import Stripe from "stripe";
+import Stripe from "npm:stripe@17";
 import { json } from "../_shared/http.ts";
 import { liveStore } from "../_shared/live_store.ts";
 import type { TicketEmail } from "../_shared/tickets.ts";

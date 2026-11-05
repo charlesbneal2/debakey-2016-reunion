@@ -1,4 +1,4 @@
-import Stripe from "stripe";
+import Stripe from "npm:stripe@17";
 import { handleCheckout } from "./handler.ts";
 
 if (import.meta.main) {

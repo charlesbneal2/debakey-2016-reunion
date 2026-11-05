@@ -4,10 +4,7 @@
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
-    "@electric-sql/pglite": "npm:@electric-sql/pglite@0.3",
-    "stripe": "npm:stripe@17",
-    "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
-    "qrcode": "npm:qrcode@1"
+    "@electric-sql/pglite": "npm:@electric-sql/pglite@0.3"
   },
   "nodeModulesDir": "none"
 }

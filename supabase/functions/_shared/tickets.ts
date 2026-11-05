@@ -1,4 +1,4 @@
-import QRCode from "qrcode";
+import QRCode from "npm:qrcode@1";
 import type { StoredOrder } from "./store.ts";
 
 export type TicketEmail = {
