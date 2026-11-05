@@ -1,0 +1,16 @@
+project_id = "debakey-2016-reunion"
+
+[functions.create-checkout]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.guest-list]
+verify_jwt = false
+
+[functions.ticket]
+verify_jwt = false
+
+[functions.door]
+verify_jwt = false
