@@ -74,7 +74,7 @@ await test("key facts fit on first screen of a small phone", async (open) => {
   const page = await open({ width: 360, height: 640 });
   await page.goto(BASE);
   const cover = page.locator("#cover");
-  for (const text of ["November 28, 2026", "Bad Astronaut", "Get Tickets", "832-860-7467"]) {
+  for (const text of ["November 28, 2026", "Bad Astronaut", "Get Tickets", "281-966-5720"]) {
     const box = await cover.getByText(text).first().boundingBox();
     assert.ok(box, `${text} is visible`);
     assert.ok(box.y + box.height <= 640, `${text} bottom ${box.y + box.height} <= 640`);
@@ -176,7 +176,7 @@ await test("checkout failure shows contact and re-enables button", async (open) 
   await page.getByLabel("Your name").fill("Jane Doe");
   const button = page.getByRole("button", { name: "Continue to payment" });
   await button.click();
-  await page.locator("#form-status").getByText("832-860-7467").waitFor();
+  await page.locator("#form-status").getByText("281-966-5720").waitFor();
   assert.equal(await button.isEnabled(), true);
 });
 
@@ -187,7 +187,7 @@ await test("network failure shows contact and re-enables button", async (open) =
   await page.getByLabel("Your name").fill("Jane Doe");
   const button = page.getByRole("button", { name: "Continue to payment" });
   await button.click();
-  await page.locator("#form-status").getByText("832-860-7467").waitFor();
+  await page.locator("#form-status").getByText("281-966-5720").waitFor();
   assert.equal(await button.isEnabled(), true);
 });
 
@@ -233,7 +233,7 @@ await test("page has share tags, contact link, and seal alt text", async (open) 
     assert.ok(await page.locator(`meta[property="${property}"]`).getAttribute("content"), property);
   }
   assert.match(await page.locator('meta[property="og:image"]').getAttribute("content"), /^https:\/\/debakey2016reunion\.com\//);
-  assert.ok(await page.locator('a[href="tel:+18328607467"]').count());
+  assert.ok(await page.locator('a[href="tel:+12819665720"]').count());
   assert.match(await page.locator("#cover img").getAttribute("alt"), /DeBakey/);
   const loaded = await page.locator("#cover img").evaluate((img) => img.decode().then(() => img.naturalWidth));
   assert.ok(loaded > 0, "seal image loads");
@@ -257,7 +257,7 @@ await test("privacy page is linked and says what is collected and who to contact
   await page.locator("#questions").getByRole("link", { name: "Privacy" }).click();
   await page.waitForURL("**/privacy");
   await page.getByRole("heading", { name: "Privacy" }).waitFor();
-  for (const text of ["name", "email", "Stripe", "832-860-7467"]) {
+  for (const text of ["name", "email", "Stripe", "281-966-5720"]) {
     await page.locator("main").getByText(text).first().waitFor();
   }
   assert.equal(await noOverflow(page), true);
@@ -272,7 +272,7 @@ await test("thanks page explains next steps", async (open) => {
   await page.goto(`${BASE}/thanks`);
   await page.getByText("on their way").waitFor();
   await page.getByText("15 minutes").waitFor();
-  assert.ok(await page.locator('a[href="tel:+18328607467"]').count());
+  assert.ok(await page.locator('a[href="tel:+12819665720"]').count());
   assert.equal(await noOverflow(page), true);
 });
 
@@ -300,7 +300,7 @@ await test("unknown ticket shows not found and contact", async (open) => {
   await page.route(TICKET, (route) => json(route, { error: "Ticket not found." }, 404));
   await page.goto(`${BASE}/ticket?t=bad`);
   await page.getByText("not found").waitFor();
-  await page.getByText("832-860-7467").first().waitFor();
+  await page.getByText("281-966-5720").first().waitFor();
 });
 
 await test("thanks, ticket, and door pages are not indexed or linked", async (open) => {

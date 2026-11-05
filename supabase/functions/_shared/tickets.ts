@@ -66,7 +66,7 @@ export async function buildTicketEmail(order: StoredOrder, siteUrl: string): Pro
       <p>You're in, ${escapeHtml(order.buyer_name)}! Show ${order.tickets.length > 1 ? "these QR codes" : "this QR code"} at the door.</p>
       <p><strong>Saturday, November 28, 2026 &middot; 7&ndash;10 PM</strong><br>Bad Astronaut &middot; Houston, TX</p>
       ${blocks.join("")}
-      <p>Questions? Call Mourad Berrached at 832-860-7467.</p>
+      <p>Questions? Call Charles Neal at 281-966-5720.</p>
     </div>`;
 
   return { subject: "Your DeBakey reunion tickets", html, attachments };

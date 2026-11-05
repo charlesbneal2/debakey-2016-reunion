@@ -45,7 +45,7 @@ These count as failure even if the site otherwise works:
 
 - Look: **Yearbook Cover**, mockup A. Deep navy, thin foil-style double border, classic serif, seal centered, white Get Tickets button.
 - Stack: GitHub Pages, Supabase edge functions, Stripe.
-- Contact: Mourad Berrached, 832-860-7467 (public on the page; confirm Mourad agrees before launch).
+- Contact: Charles Neal, 281-966-5720 (public on the page; the contact's own number).
 - Price: $20 per ticket; +1 costs $40 total.
 - Door: QR tickets with a scanner page; opt-in who's coming list.
 - A step-by-step Stripe setup guide is a required deliverable, since the user has not set Stripe up yet.
@@ -68,9 +68,9 @@ One page, in this order:
 2. **Yearbook.** Styled like a yearbook spread, with slots for photos, quotes, and memories. Content lives in an HTML block with comments marking each slot. Empty slots do not render, so the section is hidden until content exists.
 3. **Who's coming.** Opt-in names, as "Jane Doe" or "Jane Doe +1". Classmates only; guest names never appear.
 4. **Tickets.** Choose "Just me, $20" or "Me + guest, $40"; your name (required); guest name (optional); "Show my name on the list" (off by default). Continue goes to Stripe, which collects email and card.
-5. **Questions.** Mourad's name with a tap-to-call link, a note that the ticket covers entry, and a map link for the venue.
+5. **Questions.** Charles's name with a tap-to-call link, a note that the ticket covers entry, and a map link for the venue.
 
-After Stripe, buyers land on a thank-you page saying tickets are on their way, and to contact Mourad if nothing arrives within 15 minutes. Cancel returns to the tickets section.
+After Stripe, buyers land on a thank-you page saying tickets are on their way, and to contact Charles if nothing arrives within 15 minutes. Cancel returns to the tickets section.
 
 Accessibility basics apply: real form labels, keyboard use, adequate contrast, reduced-motion support, and alt text on the seal.
 
@@ -139,7 +139,6 @@ Placeholders can go in now; each needs a real answer before launch.
 
 - Final event times. 7-10 PM is tentative.
 - Confirm that $20 covers entry only.
-- Mourad's agreement to public phone number.
 - Venue address for Bad Astronaut.
 - A clean logo file. The current image has a textured background and a shadow, so the mockup crops it to a circle.
 - Yearbook material.

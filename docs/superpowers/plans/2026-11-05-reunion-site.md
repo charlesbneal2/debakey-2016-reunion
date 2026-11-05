@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Event copy: "Saturday, November 28, 2026", "7–10 PM", "Bad Astronaut", "Houston, TX". Time and venue address are open items, so keep them easy to change.
-- Contact: Mourad Berrached, 832-860-7467, `tel:+18328607467`.
+- Contact: Charles Neal, 281-966-5720, `tel:+12819665720`.
 - Prices: 1 ticket `$20` (`amount_total` 2000), +1 `$40` (4000). One guest maximum.
 - Sales close at `2026-11-29T04:00:00Z` (10 PM Central, CST).
 - Production origin: `https://debakey2016reunion.com`.
@@ -30,7 +30,7 @@
 2. **Names with HTML, quotes, emoji, or surrounding whitespace.** They show literally everywhere and never execute. Tests in Tasks 2, 3, and 6.
 3. **Stripe sends events out of order or twice.** A refund arriving before its order gets a 500 so Stripe retries; duplicates create nothing. Test in Task 3.
 4. **Door gets a repeat scan, simultaneous scans, or a non-ticket QR code.** Exactly one admit; others show "Already checked in" or "Not found", with no crash. Tests in Tasks 1 and 5.
-5. **Backend down, or an in-app browser from the group chat.** Checkout failure shows a clear message with Mourad's number, the button becomes usable again, and a failed guest list hides its section. Test in Task 6.
+5. **Backend down, or an in-app browser from the group chat.** Checkout failure shows a clear message with Charles's number, the button becomes usable again, and a failed guest list hides its section. Test in Task 6.
 
 ---
 
@@ -358,7 +358,7 @@ assert(documentElement.scrollWidth <= innerWidth);
 // guest-list mock 500: section hidden, no uncaught page errors
 // submit "Me + guest": POST body has with_guest true, guest_name, show_on_list false by default
 // checkout mock returns {url}: page navigates to that url
-// checkout mock 500: error text contains "832-860-7467"; submit button enabled again
+// checkout mock 500: error text contains "281-966-5720"; submit button enabled again
 // after SALES_CLOSE (page.clock at 2026-11-29T04:00:00Z): form replaced with "Ticket sales have closed."
 // <title>, og:title, og:description, og:image present; seal img has alt text
 ```
@@ -401,9 +401,9 @@ git commit -m "feat: add yearbook-style reunion page"
 - [ ] **Step 1: Add failing checks to `tests/layout.mjs`, using mocks**
 
 ```js
-// /thanks: text says tickets are on their way, mentions 15 minutes and 832-860-7467
+// /thanks: text says tickets are on their way, mentions 15 minutes and 281-966-5720
 // /ticket?t=x with mock: shows QR <img> and label via textContent; voided shows "no longer valid"
-// /ticket?t=bad with 404 mock: shows "not found" and 832-860-7467
+// /ticket?t=bad with 404 mock: shows "not found" and 281-966-5720
 // /door: login form first; wrong password shows error
 // /door with mocked ok scan: large green state with label
 // mocked already: red with formatted time in America/Chicago, e.g. "Already checked in at 7:42 PM"
@@ -496,7 +496,7 @@ Expected: every result above observed; record any failure and fix it before cont
 
 - [ ] **Step 4: Resolve Spec open items with the user**
 
-Final times, entry-only, Mourad's consent, venue address, clean logo, yearbook material if ready. Update `site/index.html` and email copy.
+Final times, entry-only, venue address, clean logo, yearbook material if ready. Update `site/index.html` and email copy.
 
 - [ ] **Step 5: Go live, after user approval**
 

@@ -102,7 +102,6 @@ Phone camera scanning needs HTTPS, so run this against the deployed site. Every 
 - [ ] Final event time, in `site/index.html`, `site/thanks.html`, `site/ticket.html`, and `supabase/functions/_shared/tickets.ts`
 - [ ] Sales closing time, if the end time changes, in `site/app.js` and `supabase/functions/_shared/rules.ts`
 - [ ] Confirm the ticket covers entry only
-- [ ] Mourad agrees to the public phone number
 - [ ] Venue address and map link, in the same files as the time
 - [ ] Clean logo file, if available
 - [ ] Yearbook material, if ready
