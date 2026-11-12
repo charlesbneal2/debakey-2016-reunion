@@ -91,4 +91,4 @@ window.addEventListener("pageshow", () => {
 });
 
 if (new Date() >= SALES_CLOSE) closeSales();
-loadGuests();
+// loadGuests(); // Guest list paused. See the note in index.html.

@@ -62,18 +62,17 @@ cd site && npx serve@14 -l 8000
 
 Open http://localhost:8000 in your Windows browser. Every item must pass.
 
-- [ ] Buy **Me + guest** with card `4242 4242 4242 4242`, using an inbox you can check, with the name on the list.
+- [ ] Buy **Me + guest** with card `4242 4242 4242 4242`, using an inbox you can check.
 - [ ] Thanks page appears; one email arrives with **two** QR codes.
 - [ ] QR codes display in Gmail and iPhone Mail. Links open each ticket page while the local site is running.
-- [ ] Your name appears under Who's coming with `+1`, after up to a minute.
 - [ ] In Stripe, open the `checkout.session.completed` event and click **Resend**. No second email; no new tickets.
 - [ ] Open http://localhost:8000/door on the computer, then allow the camera. Browsers allow camera use on `localhost` without HTTPS.
 - [ ] Hold the email up to the webcam on your phone and scan both codes: green, showing the right names.
 - [ ] Scan one again: red, "Already checked in".
 - [ ] Find a ticket with name search.
-- [ ] Refund the payment in full in Stripe. Your name leaves the list, and scanning shows "Refunded or voided".
+- [ ] Refund the payment in full in Stripe. Scanning shows "Refunded or voided".
 - [ ] Try a declined card: `4000 0000 0000 9995`. No tickets or email.
-- [ ] Buy **Just me** with a name containing HTML and emoji, such as `<b>Jo</b> 🎉`. It displays literally in the email, list, and door.
+- [ ] Buy **Just me** with a name containing HTML and emoji, such as `<b>Jo</b> 🎉`. It displays literally in the email and at the door.
 - [ ] Practice the mistyped-email fix below. The same QR codes arrive at the new address.
 - [ ] Send a forged door request, then check **Edge Functions > door > Logs** or `door_failures` to see which IP was recorded. If the forged value was recorded, password limiting can be bypassed, so fix that before launch:
 

@@ -80,7 +80,7 @@
       <div class="wrap wrap-narrow">
         <p class="eyebrow">Admission</p>
         <h2 id="tickets-title">Get your tickets</h2>
-        <p class="muted">Tickets are $15 each. We'll email a QR code for each person to show at the door.</p>
+        <p class="muted">Tickets are $15 each and include entry and one free drink. We'll email a QR code for each person to show at the door.</p>
 
         <form id="ticket-form" class="ticket-form" novalidate>
           <fieldset>
@@ -97,7 +97,7 @@
             <input id="guest-name" name="guest_name" type="text" maxlength="80" autocomplete="off">
           </label>
 
-          <label class="check"><input id="show-on-list" type="checkbox"> <span>Show my name on the list</span></label>
+          <!-- ponytail: guest list paused; remove hidden here and restore loadGuests() in app.js to bring it back --><label class="check" hidden><input id="show-on-list" type="checkbox"> <span>Show my name on the list</span></label>
 
           <button id="submit" class="button" type="submit">Continue to payment</button>
           <p class="fine">Secure payment by Stripe. You'll enter your email and card on the next page.</p>
@@ -114,7 +114,6 @@
     <div class="wrap">
       <h2>Questions?</h2>
       <p>Email <a href="mailto:info@debakey2016reunion.com">info@debakey2016reunion.com</a>.</p>
-      <p>Your ticket covers entry and one free drink.</p>
       <p><a href="https://www.google.com/maps/search/?api=1&amp;query=Eureka+Heights+Brewery+941+W+18th+St+Houston+TX+77008" target="_blank" rel="noopener">Find Eureka Heights Brewery on the map</a></p>
       <p><a href="privacy">Privacy</a></p>
     </div>
