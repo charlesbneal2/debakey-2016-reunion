@@ -1,0 +1,12 @@
+# Keep the site out of search engines.
+# Link-preview bots stay allowed so shared links show the card.
+User-agent: facebookexternalhit
+User-agent: Twitterbot
+User-agent: Slackbot-LinkExpanding
+User-agent: LinkedInBot
+User-agent: WhatsApp
+User-agent: Discordbot
+Allow: /
+
+User-agent: *
+Disallow: /
