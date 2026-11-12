@@ -119,7 +119,7 @@ The page is now public, but it only takes test cards until you switch Stripe to 
 
 - [ ] Final event time, in `site/index.html`, `site/thanks.html`, `site/ticket.html`, and `supabase/functions/_shared/tickets.ts`
 - [ ] Sales closing time, if the end time changes, in `site/app.js` and `supabase/functions/_shared/rules.ts`
-- [ ] Confirm the ticket covers entry only
+- [x] Ticket covers entry and one free drink (site says so in Questions)
 - [ ] Venue address and map link, in the same files as the time
 - [ ] Clean logo file, if available
 - [ ] Yearbook material, if ready
@@ -131,7 +131,7 @@ The page is now public, but it only takes test cards until you switch Stripe to 
   ```
 
 - [ ] Switch to live Stripe keys, price, and webhook secret (`docs/stripe-setup.md`, step 8)
-- [ ] Buy one real $20 ticket, get the email, scan it, then refund it in full
+- [ ] Buy one real $15 ticket, get the email, scan it, then refund it in full
 - [ ] Check the link preview by sending the URL to yourself in a chat
 - [ ] Share the link with the class
 
@@ -152,7 +152,7 @@ The page is now public, but it only takes test cards until you switch Stripe to 
 
 2. Send door staff `https://debakey2016reunion.com/door` and the password. Have them test it before doors open.
 3. If signal fails, check people against the printed list by name. The site won't record those check-ins.
-4. Sales close automatically at 10 PM Central.
+4. Sales close automatically at 9 PM Central.
 
 ## Fixing problems
 

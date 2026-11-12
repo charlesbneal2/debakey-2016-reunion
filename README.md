@@ -1,6 +1,6 @@
 # DeBakey Class of 2016 Ten-Year Reunion
 
-Site and ticketing for the reunion on November 28, 2026 at Bad Astronaut in Houston.
+Site and ticketing for the reunion on November 28, 2026 at Eureka Heights Brewery in Houston.
 
 - `site/`: static pages, deployed to GitHub Pages at debakey2016reunion.com
 - `supabase/`: database and edge functions for checkout, tickets, and door check-in

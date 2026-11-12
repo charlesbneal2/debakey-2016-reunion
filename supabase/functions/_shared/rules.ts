@@ -1,4 +1,4 @@
-export const SALES_CLOSE = new Date("2026-11-29T04:00:00Z"); // 10 PM Central, November 28
+export const SALES_CLOSE = new Date("2026-11-29T03:00:00Z"); // 9 PM Central, November 28
 const MAX_NAME_LENGTH = 80;
 
 export type OrderForm = {

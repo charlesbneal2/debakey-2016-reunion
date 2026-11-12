@@ -1,4 +1,4 @@
-const SALES_CLOSE = new Date("2026-11-29T04:00:00Z"); // 10 PM Central, November 28
+const SALES_CLOSE = new Date("2026-11-29T03:00:00Z"); // 9 PM Central, November 28
 const HELP = "Please try again, or call Charles at 281-966-5720.";
 
 const form = document.getElementById("ticket-form");

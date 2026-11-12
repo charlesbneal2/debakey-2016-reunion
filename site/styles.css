@@ -68,7 +68,7 @@ img { max-width: 100%; height: auto; }
 .seal {
   width: clamp(92px, 26svh, 230px);
   height: auto;
-  border-radius: 50%;
+  border-radius: 12px;
   box-shadow: 0 10px 34px rgb(5 12 45 / 45%);
 }
 
@@ -211,7 +211,7 @@ legend { font-weight: 700; margin-bottom: 10px; padding: 0; }
   width: 100%;
 }
 .panel h1 { color: var(--navy); font-size: clamp(1.5rem, 6vw, 2rem); overflow-wrap: anywhere; }
-.seal-small { display: block; height: auto; margin: 0 auto 16px; width: 104px; }
+.seal-small { border-radius: 8px; display: block; height: auto; margin: 0 auto 16px; width: 104px; }
 .event-line { font-weight: 700; }
 .qr { display: block; height: auto; margin: 16px auto; max-width: 100%; }
 

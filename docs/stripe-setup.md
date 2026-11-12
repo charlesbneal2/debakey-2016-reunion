@@ -27,10 +27,10 @@ Do this in test mode now. You'll repeat it in live mode in step 8.
 
 1. Open **Product catalog** at [dashboard.stripe.com/products](https://dashboard.stripe.com/products) and click **Add product**.
 2. Name it `Class of 2016 Reunion Ticket`.
-3. Set **One-off** pricing, **$20.00 USD**.
+3. Set **One-off** pricing, **$15.00 USD**.
 4. Save, open the product, and copy the **Price ID**. It starts with `price_`, not `prod_`.
 
-Your site asks Stripe for quantity 1 or 2, so a +1 comes to $40 automatically. Don't create a second price. The site accepts cards only, which includes Apple Pay and Google Pay where available, so tickets go out right after payment.
+Your site asks Stripe for quantity 1 or 2, so a +1 comes to $30 automatically. Don't create a second price. The site accepts cards only, which includes Apple Pay and Google Pay where available, so tickets go out right after payment.
 
 ## 3. Copy your test API key
 
@@ -41,7 +41,7 @@ Your site asks Stripe for quantity 1 or 2, so a +1 comes to $40 automatically. D
 
 ## 4. Add branding and business details
 
-1. **Branding:** open [Branding](https://dashboard.stripe.com/settings/branding). Upload `site/assets/seal.png` as both logo and icon, and set the brand color to `#12266b`.
+1. **Branding:** open [Branding](https://dashboard.stripe.com/settings/branding). Upload `site/assets/seal.jpg` as both logo and icon, and set the brand color to `#12266b`.
 2. **Public details:** open [Business details](https://dashboard.stripe.com/settings/business) and edit **Public details**:
    - Public business name, such as `DeBakey Class of 2016 Reunion`
    - Statement descriptor: `DEBAKEY REUNION`, which is what appears on card statements
@@ -110,7 +110,7 @@ Two test-mode differences to expect:
 
 4. Turn on receipts: open [Customer emails](https://dashboard.stripe.com/settings/emails) and, under **Payments**, turn on **Successful payments**. Turn on **Refunds** too.
 
-Then do the one real $20 test purchase in the runbook.
+Then do the one real $15 test purchase in the runbook.
 
 ## Everyday tasks
 
@@ -122,13 +122,13 @@ Then do the one real $20 test purchase in the runbook.
 | Refund | What happens |
 | --- | --- |
 | Full amount | Tickets are voided automatically and the name leaves the list. |
-| Part of a +1 order ($20 of $40) | **Nothing changes automatically.** Void the guest ticket by hand, using the steps in the runbook. |
+| Part of a +1 order ($15 of $30) | **Nothing changes automatically.** Void the guest ticket by hand, using the steps in the runbook. |
 
 Refunds take several days to reach the buyer. Stripe doesn't return its original processing fee, so a refund costs you that fee. Check [Stripe's pricing page](https://stripe.com/pricing) for current rates.
 
 ### Check your money
 
-Open [Balances](https://dashboard.stripe.com/balance). Stripe pays out to your bank on a rolling schedule. Fees come out of each sale, so a standard US card sale at 2.9% + 30¢ nets about $19.12 per $20 ticket, or about $38.54 on a $40 order.
+Open [Balances](https://dashboard.stripe.com/balance). Stripe pays out to your bank on a rolling schedule. Fees come out of each sale, so a standard US card sale at 2.9% + 30¢ nets about $14.26 per $15 ticket, or about $28.83 on a $30 order.
 
 ### If a buyer disputes a charge
 

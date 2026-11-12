@@ -64,7 +64,7 @@ export async function buildTicketEmail(order: StoredOrder, siteUrl: string): Pro
         <h1 style="margin:8px 0 0;font-size:26px;font-weight:normal">The Ten-Year Reunion</h1>
       </div>
       <p>You're in, ${escapeHtml(order.buyer_name)}! Show ${order.tickets.length > 1 ? "these QR codes" : "this QR code"} at the door.</p>
-      <p><strong>Saturday, November 28, 2026 &middot; 7&ndash;10 PM</strong><br>Bad Astronaut &middot; Houston, TX</p>
+      <p><strong>Saturday, November 28, 2026 &middot; 6&ndash;9 PM</strong><br>Eureka Heights Brewery &middot; 941 W 18th St, Houston, TX 77008</p>
       ${blocks.join("")}
       <p>Questions? Call Charles Neal at 281-966-5720.</p>
     </div>`;

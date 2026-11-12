@@ -151,7 +151,7 @@ Deno.test("email uses one QR per ticket and escapes names", async () => {
     assertStringIncludes(html, `${SITE}/ticket?t=${token}`);
   }
   assertStringIncludes(html, "Saturday, November 28, 2026");
-  assertStringIncludes(html, "Bad Astronaut");
+  assertStringIncludes(html, "Eureka Heights Brewery");
 });
 
 Deno.test("unnamed guest ticket labeled Guest of buyer", async () => {

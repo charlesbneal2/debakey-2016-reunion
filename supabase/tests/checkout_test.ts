@@ -73,7 +73,7 @@ Deno.test("show_on_list requires literal true", () => {
 });
 
 Deno.test("closed exactly at SALES_CLOSE", async () => {
-  assertEquals(SALES_CLOSE.toISOString(), "2026-11-29T04:00:00.000Z");
+  assertEquals(SALES_CLOSE.toISOString(), "2026-11-29T03:00:00.000Z");
   const before = await handleCheckout(
     post({ name: "Jane" }),
     deps({ now: () => new Date(SALES_CLOSE.getTime() - 1) }),
