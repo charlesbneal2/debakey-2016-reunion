@@ -1,5 +1,5 @@
 const SALES_CLOSE = new Date("2026-11-29T03:00:00Z"); // 9 PM Central, November 28
-const HELP = "Please try again, or call Charles at 281-966-5720.";
+const HELP = "Please try again, or email info@debakey2016reunion.com.";
 
 const form = document.getElementById("ticket-form");
 const submit = document.getElementById("submit");

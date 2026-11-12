@@ -66,7 +66,7 @@ export async function buildTicketEmail(order: StoredOrder, siteUrl: string): Pro
       <p>You're in, ${escapeHtml(order.buyer_name)}! Show ${order.tickets.length > 1 ? "these QR codes" : "this QR code"} at the door.</p>
       <p><strong>Saturday, November 28, 2026 &middot; 6&ndash;9 PM</strong><br>Eureka Heights Brewery &middot; 941 W 18th St, Houston, TX 77008</p>
       ${blocks.join("")}
-      <p>Questions? Call Charles Neal at 281-966-5720.</p>
+      <p>Questions? Email <a href="mailto:info@debakey2016reunion.com">info@debakey2016reunion.com</a>.</p>
     </div>`;
 
   return { subject: "Your DeBakey reunion tickets", html, attachments };
