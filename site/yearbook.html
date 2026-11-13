@@ -24,24 +24,8 @@
           <img src="yearbook/pages/front.webp" alt="Yearbook front cover: From Every Angle">
         </div>
         <!-- yearbook.js inserts the 118 interior pages here -->
-        <div class="page page-paper" id="sign-page">
-          <form id="sign-form" class="yb-sign-form" novalidate>
-            <h2>Sign the yearbook</h2>
-            <label for="sign-name">Your name</label>
-            <input id="sign-name" name="name" maxlength="60" autocomplete="name" required>
-            <label for="sign-message">Message <span class="yb-optional">(optional)</span></label>
-            <textarea id="sign-message" name="message" maxlength="280" rows="5"></textarea>
-            <button id="sign-submit" class="button" type="submit">Sign</button>
-            <p id="sign-status" class="yb-status" role="status" hidden></p>
-          </form>
-        </div>
-        <div class="page page-paper" id="signatures-page">
-          <div class="yb-signatures">
-            <h2>Signatures</h2>
-            <p id="signatures-note" class="yb-note" hidden></p>
-            <ol id="signature-list" class="yb-signature-list"></ol>
-          </div>
-        </div>
+        <div class="page page-paper page-sign" id="sign-left" title="Open to sign the yearbook"><div class="sheet-mini"></div></div>
+        <div class="page page-paper page-sign" id="sign-right" title="Open to sign the yearbook"><div class="sheet-mini"></div></div>
         <div class="page page-cover" data-density="hard">
           <img src="yearbook/pages/back.webp" alt="Yearbook back cover">
         </div>
@@ -56,8 +40,27 @@
     </nav>
   </main>
 
+  <div id="signer" class="signer" role="dialog" aria-modal="true" aria-label="Sign the yearbook" hidden>
+    <div class="signer-bar">
+      <button id="signer-close" class="button button-quiet" type="button">&larr; Back to book</button>
+      <p class="signer-hint">Tap anywhere to write. Pinch or scroll to zoom.</p>
+      <button id="write-here" class="button" type="button">Write here</button>
+    </div>
+    <div id="signer-viewport" class="signer-viewport">
+      <div id="sheet" class="sheet"></div>
+    </div>
+    <div id="write-tools" class="signer-tools" hidden>
+      <button id="size-down" class="button button-quiet" type="button" aria-label="Smaller text">A&minus;</button>
+      <button id="size-up" class="button button-quiet" type="button" aria-label="Bigger text">A+</button>
+      <button id="write-cancel" class="button button-quiet" type="button">Cancel</button>
+      <button id="write-post" class="button" type="button">Post</button>
+    </div>
+    <p id="signer-status" class="signer-status" role="status" hidden></p>
+  </div>
+
   <script src="config.js"></script>
   <script src="vendor/page-flip.browser.js"></script>
+  <script src="vendor/panzoom.min.js"></script>
   <script src="yearbook.js"></script>
 </body>
 </html>

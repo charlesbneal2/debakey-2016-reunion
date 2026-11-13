@@ -1,19 +1,12 @@
 (() => {
   const PAGES = 118;
-  const SIGN = PAGES + 1; // index of the sign form page; front cover is 0
+  const SIGN = PAGES + 1; // index of the left signing page; front cover is 0
   const LAST = PAGES + 3; // back cover
   const SIGNATURES_URL = `${window.FUNCTIONS_URL}/signatures`;
 
   const book = document.getElementById("book");
-  const signPage = document.getElementById("sign-page");
+  const signPages = [document.getElementById("sign-left"), document.getElementById("sign-right")];
   const indicator = document.getElementById("page-indicator");
-  const form = document.getElementById("sign-form");
-  const nameInput = document.getElementById("sign-name");
-  const messageInput = document.getElementById("sign-message");
-  const submit = document.getElementById("sign-submit");
-  const status = document.getElementById("sign-status");
-  const list = document.getElementById("signature-list");
-  const note = document.getElementById("signatures-note");
 
   // Interior pages: odd = left half of a spread, even = right half.
   for (let n = 1; n <= PAGES; n++) {
@@ -23,15 +16,16 @@
     img.dataset.src = `yearbook/pages/${String(n).padStart(3, "0")}.webp`;
     img.alt = `Yearbook page ${n}`;
     page.append(img);
-    book.insertBefore(page, signPage);
+    book.insertBefore(page, signPages[0]);
   }
   const pages = [...book.querySelectorAll(".page")];
 
-  // Keep taps, drags and scrolling on the signing pages from turning the page.
-  for (const el of [signPage, document.getElementById("signatures-page")]) {
+  // Taps on the signing pages open the signer instead of turning the page.
+  for (const el of signPages) {
     for (const type of ["mousedown", "touchstart", "pointerdown"]) {
       el.addEventListener(type, (event) => event.stopPropagation());
     }
+    el.addEventListener("click", () => openSigner());
   }
 
   const flip = new St.PageFlip(book, {
@@ -76,76 +70,194 @@
   flip.on("flip", update);
   flip.on("changeOrientation", update);
 
-  const goToSign = () => {
-    flip.turnToPage(SIGN);
-    update();
-  };
   document.getElementById("prev").addEventListener("click", () => flip.flipPrev());
   document.getElementById("next").addEventListener("click", () => flip.flipNext());
-  document.getElementById("sign-jump").addEventListener("click", goToSign);
+  document.getElementById("sign-jump").addEventListener("click", () => openSigner());
 
-  document.addEventListener("keydown", (event) => {
-    if (event.target.closest("input, textarea, select, [contenteditable]")) return;
-    if (event.key === "ArrowRight") flip.flipNext();
-    if (event.key === "ArrowLeft") flip.flipPrev();
-  });
+  // ---- Signing sheet: one big zoomable sheet, messages pinned where people tapped. ----
+  const SHEET_W = 6000;
+  const SHEET_H = 4000;
+  const BOX_W = 600; // max message width, sheet units
+  const SIZES = [16, 24, 36, 54, 80];
+  const signer = document.getElementById("signer");
+  const viewport = document.getElementById("signer-viewport");
+  const sheet = document.getElementById("sheet");
+  const tools = document.getElementById("write-tools");
+  const sizeDown = document.getElementById("size-down");
+  const sizeUp = document.getElementById("size-up");
+  const postButton = document.getElementById("write-post");
+  const status = document.getElementById("signer-status");
+  const minis = signPages.map((page) => page.querySelector(".sheet-mini"));
 
-  if (location.hash === "#sign") goToSign();
-  else update();
+  const panzoom = Panzoom(sheet, { canvas: true, origin: "0 0", maxScale: 2, step: 0.2 });
+  viewport.addEventListener("wheel", panzoom.zoomWithWheel);
 
-  // Signatures
-  function signatureItem({ name, message }) {
-    const li = document.createElement("li");
-    const who = document.createElement("span");
-    who.className = "yb-signature-name";
-    who.textContent = name;
-    li.append(who);
-    if (message) {
-      const text = document.createElement("p");
-      text.textContent = message;
-      li.append(text);
-    }
-    return li;
-  }
+  let box = null; // the write box while writing
+  let sizeIndex = 1;
 
   function showStatus(text) {
     status.textContent = text;
-    status.hidden = false;
+    status.hidden = !text;
   }
 
-  fetch(SIGNATURES_URL)
-    .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.status))))
-    .then(({ signatures }) => list.append(...signatures.map(signatureItem)))
-    .catch(() => {
-      note.textContent = "Couldn't load signatures. Refresh to try again.";
-      note.hidden = false;
-    });
+  function renderSignature({ message, x, y, size }) {
+    const el = document.createElement("div");
+    el.className = "signature";
+    el.style.left = `${x * SHEET_W}px`;
+    el.style.top = `${y * SHEET_H}px`;
+    el.style.fontSize = `${size}px`;
+    el.textContent = message;
+    return el;
+  }
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    if (submit.disabled) return;
-    const name = nameInput.value.trim();
-    const message = messageInput.value.trim();
-    if (!name) {
-      showStatus("Please add your name.");
-      nameInput.focus();
+  function addSignature(signature) {
+    sheet.append(renderSignature(signature));
+    for (const mini of minis) mini.append(renderSignature(signature));
+  }
+
+  // Mini copies inside the book: left page shows the left half of the sheet, right page the right half.
+  const resizeMinis = new ResizeObserver(() => {
+    minis.forEach((mini, i) => {
+      const scale = signPages[i].clientWidth / (SHEET_W / 2);
+      mini.style.transform = `scale(${scale}) translateX(${i ? -SHEET_W / 2 : 0}px)`;
+    });
+  });
+  signPages.forEach((page) => resizeMinis.observe(page));
+
+  // Panzoom transform is scale(s) translate(x, y) with origin 0 0.
+  function view(scale, x, y) {
+    panzoom.zoom(scale, { animate: false, force: true });
+    panzoom.pan(x, y, { animate: false, force: true });
+  }
+
+  function fit() {
+    const scale = Math.min(viewport.clientWidth / SHEET_W, viewport.clientHeight / SHEET_H) * 0.96;
+    panzoom.setOptions({ minScale: scale });
+    view(scale, (viewport.clientWidth / scale - SHEET_W) / 2, (viewport.clientHeight / scale - SHEET_H) / 2);
+  }
+
+  function centreOn(sheetX, sheetY, scale = 1) {
+    view(scale, viewport.clientWidth / 2 / scale - sheetX, viewport.clientHeight / 2 / scale - sheetY);
+  }
+
+  function toSheet(clientX, clientY) {
+    const rect = sheet.getBoundingClientRect();
+    return [((clientX - rect.left) / rect.width) * SHEET_W, ((clientY - rect.top) / rect.height) * SHEET_H];
+  }
+
+  function setSize(index) {
+    sizeIndex = Math.max(0, Math.min(SIZES.length - 1, index));
+    if (box) box.style.fontSize = `${SIZES[sizeIndex]}px`;
+    sizeDown.disabled = sizeIndex === 0;
+    sizeUp.disabled = sizeIndex === SIZES.length - 1;
+    grow();
+  }
+
+  function grow() {
+    if (!box) return;
+    box.style.height = "auto";
+    box.style.height = `${box.scrollHeight}px`;
+  }
+
+  function startWriting(sheetX, sheetY) {
+    // Keep the whole box on the sheet.
+    const x = Math.max(0, Math.min(SHEET_W - BOX_W, sheetX));
+    const y = Math.max(0, Math.min(SHEET_H * 0.97, sheetY));
+    if (!box) {
+      box = document.createElement("textarea");
+      box.id = "write-box";
+      box.className = "write-box panzoom-exclude";
+      box.maxLength = 280;
+      box.rows = 1;
+      box.placeholder = "Write your message…";
+      box.setAttribute("aria-label", "Your message");
+      box.addEventListener("input", grow);
+      sheet.append(box);
+    }
+    box.style.left = `${x}px`;
+    box.style.top = `${y}px`;
+    setSize(sizeIndex);
+    tools.hidden = false;
+    showStatus("");
+    centreOn(x + BOX_W / 2, y + SIZES[sizeIndex]);
+    box.focus({ preventScroll: true });
+  }
+
+  function stopWriting() {
+    box?.remove();
+    box = null;
+    tools.hidden = true;
+    fit();
+  }
+
+  function openSigner() {
+    flip.turnToPage(SIGN);
+    update();
+    signer.hidden = false;
+    document.body.style.overflow = "hidden";
+    if (!box) fit();
+  }
+
+  function closeSigner() {
+    signer.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  // A tap (not a drag or pinch) on the sheet starts writing there.
+  let down = null;
+  let pointers = 0;
+  viewport.addEventListener("pointerdown", (event) => {
+    pointers++;
+    down = pointers === 1 ? { x: event.clientX, y: event.clientY, t: Date.now() } : null;
+  }, true);
+  viewport.addEventListener("pointercancel", () => { pointers = Math.max(0, pointers - 1); down = null; }, true);
+  viewport.addEventListener("pointerup", (event) => {
+    pointers = Math.max(0, pointers - 1);
+    const tap = down && Math.hypot(event.clientX - down.x, event.clientY - down.y) < 6 && Date.now() - down.t < 500;
+    down = null;
+    if (!tap || event.target === box) return;
+    startWriting(...toSheet(event.clientX, event.clientY));
+  }, true);
+
+  document.getElementById("write-here").addEventListener("click", () => {
+    const rect = viewport.getBoundingClientRect();
+    const [x, y] = toSheet(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    startWriting(x - BOX_W / 2, y);
+  });
+  sizeDown.addEventListener("click", () => setSize(sizeIndex - 1));
+  sizeUp.addEventListener("click", () => setSize(sizeIndex + 1));
+  document.getElementById("write-cancel").addEventListener("click", stopWriting);
+  document.getElementById("signer-close").addEventListener("click", closeSigner);
+  window.addEventListener("resize", () => {
+    if (!signer.hidden && !box) fit();
+  });
+
+  postButton.addEventListener("click", async () => {
+    if (postButton.disabled || !box) return;
+    const message = box.value.trim();
+    if (!message) {
+      showStatus("Write something first.");
+      box.focus();
       return;
     }
-
-    submit.disabled = true;
-    status.hidden = true;
+    const round = (n) => Math.round(n * 10000) / 10000;
+    const body = {
+      message,
+      x: round(parseFloat(box.style.left) / SHEET_W),
+      y: round(parseFloat(box.style.top) / SHEET_H),
+      size: SIZES[sizeIndex],
+    };
+    postButton.disabled = true;
     try {
       const res = await fetch(SIGNATURES_URL, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ name, message }),
+        body: JSON.stringify(body),
       });
       if (res.status === 201) {
-        const { signature } = await res.json();
-        list.prepend(signatureItem(signature));
-        form.reset();
+        addSignature((await res.json()).signature);
+        stopWriting();
         showStatus("Thanks for signing!");
-        if (flip.getOrientation() === "portrait") flip.flipNext(); // show the list on phones
       } else if (res.status === 429) {
         showStatus("You've signed a lot. Try again later.");
       } else {
@@ -154,7 +266,26 @@
     } catch {
       showStatus("Couldn't save. Try again.");
     } finally {
-      submit.disabled = false;
+      postButton.disabled = false;
     }
   });
+
+  document.addEventListener("keydown", (event) => {
+    if (!signer.hidden) {
+      if (event.key === "Escape") box ? stopWriting() : closeSigner();
+      return; // never turn book pages while signing
+    }
+    if (event.target.closest("input, textarea, select, [contenteditable]")) return;
+    if (event.key === "ArrowRight") flip.flipNext();
+    if (event.key === "ArrowLeft") flip.flipPrev();
+  });
+
+  fetch(SIGNATURES_URL)
+    .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.status))))
+    .then(({ signatures }) => signatures.forEach(addSignature))
+    .catch(() => showStatus("Couldn't load signatures. Refresh to try again."));
+
+  // Defer: Panzoom resets its pan in a setTimeout right after it is created.
+  if (location.hash === "#sign") setTimeout(openSigner);
+  else update();
 })();

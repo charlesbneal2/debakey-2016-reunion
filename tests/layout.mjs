@@ -420,7 +420,7 @@ await test("door network failure points staff to printed list", async (open) => 
 
 // --- Yearbook ---
 const SIGS = "**/signatures";
-const SIG = (name, message = "") => ({ name, message, created_at: "2026-11-10T12:00:00Z" });
+const SIG = (message, x = 0.5, y = 0.5, size = 24) => ({ message, x, y, size, created_at: "2026-11-10T12:00:00Z" });
 const indicator = (page) => page.locator("#page-indicator").textContent();
 
 async function openBook(open, options = {}, hash = "") {
@@ -459,73 +459,6 @@ await test("yearbook opens on front cover and next turns page", async (open) => 
   assert.equal(await page.locator('img[src$="001.webp"]').isVisible(), true);
 });
 
-for (const [width, height] of [[390, 844], [1280, 800]]) {
-  await test(`sign link opens on signing form at ${width}`, async (open) => {
-    const page = await openBook(open, { width, height }, "#sign");
-    assert.equal(await page.locator("#sign-name").isVisible(), true);
-    await page.screenshot({ path: join(SHOTS, `yearbook-sign-${width}.png`) });
-  });
-}
-
-await test("sign-jump button goes to signing form", async (open) => {
-  const page = await openBook(open);
-  await page.locator("#sign-jump").click();
-  await page.locator("#sign-name").waitFor({ state: "visible" });
-});
-
-await test("signature list renders newest first", async (open) => {
-  const page = await openBook(open, { width: 1280, height: 800, signatures: [SIG("B", "two"), SIG("A")] }, "#sign");
-  const items = await page.locator("#signature-list li").allTextContents();
-  assert.equal(items.length, 2);
-  assert.match(items[0], /B/);
-  assert.match(items[0], /two/);
-  assert.match(items[1], /A/);
-});
-
-await test("signing posts and shows new signature", async (open) => {
-  const page = await openBook(open, { signatures: [SIG("Old")] }, "#sign");
-  const posted = await routePost(page, (route) => json(route, { signature: SIG("Jane", "hi") }, 201));
-  await page.locator("#sign-name").fill("Jane");
-  await page.locator("#sign-message").fill("hi");
-  await page.locator("#sign-submit").click();
-  await page.locator("#signature-list li").first().filter({ hasText: "Jane" }).waitFor({ state: "attached" });
-  assert.deepEqual(posted, [{ name: "Jane", message: "hi" }]);
-  // Phones flip to the list after signing; StPageFlip clones the page during the flip.
-  await page.waitForFunction(() => document.querySelectorAll("#sign-name").length === 1);
-  assert.equal(await page.locator("#sign-name").inputValue(), "");
-  assert.equal(await page.locator("#sign-message").inputValue(), "");
-});
-
-await test("yearbook blank name is stopped before any request", async (open) => {
-  const page = await openBook(open, {}, "#sign");
-  const posted = await routePost(page, (route) => json(route, { signature: SIG("x") }, 201));
-  await page.locator("#sign-name").fill("   ");
-  await page.locator("#sign-submit").click();
-  await page.locator("#sign-status").waitFor({ state: "visible" });
-  assert.deepEqual(posted, []);
-});
-
-await test("429 shows try-later message and re-enables button", async (open) => {
-  const page = await openBook(open, {}, "#sign");
-  await routePost(page, (route) => json(route, { error: "Too many signatures. Try again later." }, 429));
-  await page.locator("#sign-name").fill("Jane");
-  await page.locator("#sign-submit").click();
-  await page.locator("#sign-status").filter({ hasText: /later/i }).waitFor();
-  assert.equal(await page.locator("#sign-submit").isEnabled(), true);
-});
-
-await test("typing in sign form does not flip", async (open) => {
-  const page = await openBook(open, {}, "#sign");
-  const before = await indicator(page);
-  await page.locator("#sign-message").click();
-  await page.keyboard.type("hello world");
-  await page.keyboard.press("ArrowLeft");
-  await page.keyboard.press("ArrowRight");
-  await page.waitForTimeout(1200);
-  assert.equal(await indicator(page), before);
-  assert.equal(await page.locator("#sign-name").isVisible(), true);
-});
-
 await test("arrow keys flip when not typing", async (open) => {
   const page = await openBook(open, { width: 1280, height: 800 });
   const before = await indicator(page);
@@ -533,51 +466,215 @@ await test("arrow keys flip when not typing", async (open) => {
   await page.waitForFunction((text) => document.querySelector("#page-indicator").textContent !== text, before);
 });
 
-await test("long signature wraps", async (open) => {
-  const sigs = [SIG("x".repeat(60), "a".repeat(280)), SIG("Link", `https://example.com/${"b".repeat(250)}`)];
-  for (const [width, height] of [[1280, 800], [360, 640]]) {
-    const page = await openBook(open, { width, height, signatures: sigs }, "#sign");
-    const list = page.locator("#signature-list");
-    assert.equal(await list.evaluate((el) => el.scrollWidth <= el.clientWidth), true, `list at ${width}`);
-    assert.equal(await noOverflow(page), true, `page at ${width}`);
-    await page.context().close();
-  }
+
+// --- Yearbook signing sheet ---
+async function openSigner(open, options = {}) {
+  const page = await openBook(open, options, "#sign");
+  await page.locator("#signer").waitFor({ state: "visible" });
+  return page;
+}
+
+async function viewportCentre(page) {
+  const box = await page.locator("#signer-viewport").boundingBox();
+  return [box.x + box.width / 2, box.y + box.height / 2];
+}
+
+async function tapToWrite(page, point) {
+  const [x, y] = point ?? (await viewportCentre(page));
+  await page.mouse.click(x, y);
+  await page.locator("#write-box").waitFor({ state: "visible" });
+}
+
+const echo = (route) =>
+  json(route, { signature: { ...route.request().postDataJSON(), created_at: "2026-11-10T12:00:00Z" } }, 201);
+
+for (const [width, height] of [[390, 844], [1280, 800]]) {
+  await test(`#sign opens the signer at ${width}`, async (open) => {
+    const page = await openSigner(open, { width, height });
+    assert.equal(await page.locator("#sheet").isVisible(), true);
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: join(SHOTS, `signer-${width}.png`) });
+    assert.deepEqual(page.errors, []);
+  });
+}
+
+await test("sign-jump opens the signer", async (open) => {
+  const page = await openBook(open);
+  await page.locator("#sign-jump").click();
+  await page.locator("#signer").waitFor({ state: "visible" });
 });
 
-await test("signature text is literal", async (open) => {
-  const page = await openBook(open, { width: 1280, height: 800, signatures: [SIG("<b>x</b>", "<img src=x onerror=alert(1)>")] }, "#sign");
-  const item = page.locator("#signature-list li").first();
-  assert.match(await item.textContent(), /<b>x<\/b>/);
-  assert.equal(await page.locator("#signature-list b, #signature-list img").count(), 0);
+await test("back to book closes the signer and signing page reopens it", async (open) => {
+  const page = await openSigner(open, { width: 1280, height: 800 });
+  await page.locator("#signer-close").click();
+  await page.locator("#signer").waitFor({ state: "hidden" });
+  await page.screenshot({ path: join(SHOTS, "yearbook-signing-spread-1280.png") });
+  await page.locator("#sign-right").click();
+  await page.locator("#signer").waitFor({ state: "visible" });
 });
 
-await test("sign button disabled while sending", async (open) => {
-  const page = await openBook(open, {}, "#sign");
+await test("signatures render at their positions", async (open) => {
+  const page = await openSigner(open, { width: 1280, height: 800, signatures: [SIG("A", 0.5, 0.25, 36)] });
+  const sig = page.locator("#sheet .signature");
+  await sig.waitFor({ state: "attached" });
+  const style = await sig.evaluate((el) => [el.style.left, el.style.top, el.style.fontSize, el.textContent]);
+  assert.deepEqual(style, ["3000px", "1000px", "36px", "A"]);
+  assert.match(await page.locator("#sign-right .sheet-mini").textContent(), /A/);
+});
+
+await test("tap opens write box zoomed in at that spot", async (open) => {
+  const page = await openSigner(open);
+  await tapToWrite(page);
+  assert.equal(await page.evaluate(() => document.activeElement.id), "write-box");
+  // Panzoom applies transforms on the next animation frame.
+  await page.waitForFunction(() => document.querySelector("#sheet").getBoundingClientRect().width >= 6000 * 0.95);
+});
+
+await test("posting sends message, position and size", async (open) => {
+  const page = await openSigner(open);
+  const posted = await routePost(page, echo);
+  await tapToWrite(page);
+  await page.keyboard.type("HAGS – Jane");
+  await page.locator("#size-up").click();
+  await page.locator("#write-post").click();
+  await page.locator("#sheet .signature").filter({ hasText: "HAGS – Jane" }).waitFor({ state: "attached" });
+  assert.equal(posted.length, 1);
+  const [body] = posted;
+  assert.equal(body.message, "HAGS – Jane");
+  assert.equal(body.size, 36);
+  assert.ok(body.x >= 0 && body.x <= 1 && body.y >= 0 && body.y <= 1, JSON.stringify(body));
+  assert.equal("name" in body, false);
+  assert.equal(await page.locator("#write-box").count(), 0);
+});
+
+await test("blank message is stopped before any request", async (open) => {
+  const page = await openSigner(open);
+  const posted = await routePost(page, echo);
+  await tapToWrite(page);
+  await page.keyboard.type("   ");
+  await page.locator("#write-post").click();
+  await page.locator("#signer-status").waitFor({ state: "visible" });
+  assert.deepEqual(posted, []);
+});
+
+await test("429 shows try-later message and keeps text", async (open) => {
+  const page = await openSigner(open);
+  await routePost(page, (route) => json(route, { error: "Too many signatures. Try again later." }, 429));
+  await tapToWrite(page);
+  await page.keyboard.type("hello");
+  await page.locator("#write-post").click();
+  await page.locator("#signer-status").filter({ hasText: /later/i }).waitFor();
+  assert.equal(await page.locator("#write-box").inputValue(), "hello");
+  assert.equal(await page.locator("#write-post").isEnabled(), true);
+});
+
+await test("post button disabled while sending", async (open) => {
+  const page = await openSigner(open);
   let release;
   const gate = new Promise((resolve) => (release = resolve));
   const posted = await routePost(page, async (route) => {
     await gate;
-    await json(route, { signature: SIG("Jane") }, 201);
+    await echo(route);
   });
-  await page.locator("#sign-name").fill("Jane");
-  await page.locator("#sign-submit").dblclick();
-  assert.equal(await page.locator("#sign-submit").isDisabled(), true);
+  await tapToWrite(page);
+  await page.keyboard.type("once");
+  await page.locator("#write-post").dblclick();
+  assert.equal(await page.locator("#write-post").isDisabled(), true);
   release();
-  await page.locator("#sign-submit").and(page.locator(":enabled")).waitFor();
+  await page.locator("#sheet .signature").filter({ hasText: "once" }).waitFor({ state: "attached" });
   assert.equal(posted.length, 1);
 });
 
-await test("signature load failure keeps book usable", async (open) => {
-  const page = await openBook(open, { width: 1280, height: 800, signatures: "fail" }, "#sign");
-  await page.getByText("Couldn't load signatures").waitFor();
-  const posted = await routePost(page, (route) => json(route, { signature: SIG("Jane") }, 201));
-  await page.locator("#sign-name").fill("Jane");
-  await page.locator("#sign-submit").click();
-  await page.locator("#signature-list li").filter({ hasText: "Jane" }).waitFor();
-  assert.equal(posted.length, 1);
+await test("size buttons clamp at smallest and largest", async (open) => {
+  const page = await openSigner(open);
+  await tapToWrite(page);
+  const size = () => page.locator("#write-box").evaluate((el) => getComputedStyle(el).fontSize);
+  for (let i = 0; i < 5; i++) await page.locator("#size-up").click({ force: true });
+  assert.equal(await size(), "80px");
+  assert.equal(await page.locator("#size-up").isDisabled(), true);
+  for (let i = 0; i < 5; i++) await page.locator("#size-down").click({ force: true });
+  assert.equal(await size(), "16px");
+  assert.equal(await page.locator("#size-down").isDisabled(), true);
+});
+
+await test("write-here places box in view", async (open) => {
+  const page = await openSigner(open);
+  await page.locator("#write-here").click();
+  await page.locator("#write-box").waitFor({ state: "visible" });
+  assert.equal(await page.evaluate(() => document.activeElement.id), "write-box");
+});
+
+await test("signer signature text is literal", async (open) => {
+  const page = await openSigner(open, { signatures: [SIG("<b>x</b><img src=x onerror=alert(1)>")] });
+  const sig = page.locator("#sheet .signature").first();
+  await sig.waitFor({ state: "attached" });
+  assert.match(await sig.textContent(), /<b>x<\/b>/);
+  assert.equal(await page.locator("#sheet b, #sheet img, .sheet-mini b, .sheet-mini img").count(), 0);
+});
+
+await test("long unbroken message wraps at 600 units", async (open) => {
+  const page = await openSigner(open, { signatures: [SIG("a".repeat(280), 0.1, 0.1, 80)] });
+  const sig = page.locator("#sheet .signature").first();
+  await sig.waitFor({ state: "attached" });
+  assert.ok((await sig.evaluate((el) => el.offsetWidth)) <= 600);
+});
+
+await test("dragging the sheet does not open the write box", async (open) => {
+  const page = await openSigner(open);
+  const [x, y] = await viewportCentre(page);
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 80, y + 20, { steps: 8 });
+  await page.mouse.up();
+  await page.waitForTimeout(300);
+  assert.equal(await page.locator("#write-box").count(), 0);
+});
+
+await test("tap near edge keeps box on sheet", async (open) => {
+  const page = await openSigner(open, { width: 1280, height: 800 });
+  const posted = await routePost(page, echo);
+  const box = await page.locator("#sheet").boundingBox();
+  await tapToWrite(page, [box.x + box.width - 3, box.y + box.height - 3]);
+  await page.keyboard.type("edge");
+  await page.locator("#write-post").click();
+  await page.locator("#sheet .signature").filter({ hasText: "edge" }).waitFor({ state: "attached" });
+  assert.ok(posted[0].x <= 0.9 && posted[0].y <= 0.97, JSON.stringify(posted[0]));
+});
+
+await test("typing in write box does not flip", async (open) => {
+  const page = await openSigner(open);
   const before = await indicator(page);
-  await page.locator("#prev").click();
-  await page.waitForFunction((text) => document.querySelector("#page-indicator").textContent !== text, before);
+  await tapToWrite(page);
+  await page.keyboard.type("a");
+  await page.keyboard.press("Enter");
+  await page.keyboard.type("b");
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("ArrowRight");
+  await page.waitForTimeout(1000);
+  assert.equal(await indicator(page), before);
+  assert.equal(await page.locator("#signer").isVisible(), true);
+  assert.equal(await page.locator("#write-box").inputValue(), "a\nb");
+});
+
+await test("write box survives resize", async (open) => {
+  const page = await openSigner(open);
+  await tapToWrite(page);
+  await page.keyboard.type("keep me");
+  await page.setViewportSize({ width: 390, height: 400 });
+  await page.waitForTimeout(300);
+  assert.equal(await page.locator("#write-box").inputValue(), "keep me");
+  assert.equal(await page.locator("#write-box").isVisible(), true);
+});
+
+await test("signature load failure keeps signer usable", async (open) => {
+  const page = await openSigner(open, { signatures: "fail" });
+  await page.locator("#signer-status").filter({ hasText: "Couldn't load signatures" }).waitFor();
+  const posted = await routePost(page, echo);
+  await tapToWrite(page);
+  await page.keyboard.type("still works");
+  await page.locator("#write-post").click();
+  await page.locator("#sheet .signature").filter({ hasText: "still works" }).waitFor({ state: "attached" });
+  assert.equal(posted.length, 1);
   assert.deepEqual(page.errors, []);
 });
 

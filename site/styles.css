@@ -326,27 +326,52 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .button-quiet { background: var(--white); color: var(--navy); }
 .button-quiet:hover { background: #eef1fb; }
 
-/* Signing pages: paper with handwriting */
-.yb-book .page-paper { background: #fffdf6; }
-.yb-sign-form, .yb-signatures { display: flex; flex-direction: column; height: 100%; padding: clamp(16px, 5%, 36px); }
-.yb-sign-form { gap: 6px; }
-.yb-sign-form h2, .yb-signatures h2 { color: var(--navy-deep); font-size: clamp(1.2rem, 3vw, 1.6rem); margin-bottom: 8px; }
-.yb-sign-form label { font-size: .9rem; font-weight: 500; margin-top: 6px; }
-.yb-optional { color: var(--muted); font-weight: 400; }
-.yb-sign-form input, .yb-sign-form textarea {
-  background: var(--white);
-  border: 1px solid var(--input);
-  border-radius: 8px;
-  font: 16px/1.4 var(--sans);
-  padding: 9px 12px;
-  resize: none;
-  width: 100%;
+/* Signing sheet: one 6000x4000 sheet; in the book each page shows half of it */
+.yb-book .page-paper { background: #fffdf6; cursor: zoom-in; }
+.sheet-mini { height: 4000px; left: 0; pointer-events: none; position: absolute; top: 0; transform-origin: 0 0; width: 6000px; }
+.signature {
+  color: var(--navy);
+  font-family: "Caveat", cursive;
+  line-height: 1.15;
+  max-width: 600px;
+  overflow-wrap: anywhere;
+  position: absolute;
+  white-space: pre-wrap;
 }
-.yb-sign-form input:focus, .yb-sign-form textarea:focus { border-color: var(--navy); box-shadow: 0 0 0 3px var(--ring); outline: none; }
-.yb-sign-form .button { align-self: flex-start; margin-top: 10px; }
-.yb-status, .yb-note { color: var(--navy-deep); font-size: .9rem; margin: 6px 0 0; }
-.yb-signature-list { flex: 1; list-style: none; margin: 0; min-height: 0; overflow-wrap: anywhere; overflow-y: auto; padding: 0; }
-.yb-signature-list li { border-bottom: 1px dashed var(--border); font-family: "Caveat", cursive; padding: 8px 0; }
-.yb-signature-name { color: var(--navy); font-size: 1.45rem; font-weight: 700; }
-.yb-signature-list p { font-size: 1.25rem; line-height: 1.25; margin: 2px 0 0; white-space: pre-line; }
-.yb-signature-list:empty::before { color: var(--muted); content: "No signatures yet. Be the first!"; font: 1.3rem "Caveat", cursive; }
+
+.signer { background: var(--sky); display: flex; flex-direction: column; inset: 0; position: fixed; z-index: 20; }
+.signer[hidden] { display: none; }
+.signer-bar, .signer-tools { align-items: center; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 10px 16px; }
+.signer-bar { justify-content: space-between; }
+.signer-hint { color: var(--navy-deep); font-size: .9rem; margin: 0; text-align: center; }
+.signer-tools[hidden] { display: none; }
+.signer-tools .button { min-width: 52px; padding: 0 16px; }
+.signer-viewport { cursor: crosshair; flex: 1; min-height: 0; overflow: hidden; position: relative; touch-action: none; }
+.sheet {
+  background: #fffdf6 linear-gradient(90deg, transparent 2990px, rgb(0 0 0 / 6%) 3000px, transparent 3010px);
+  box-shadow: var(--shadow);
+  height: 4000px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 6000px;
+}
+.write-box {
+  background: rgb(255 255 255 / 70%);
+  border: 2px dashed var(--royal);
+  border-radius: 6px;
+  color: var(--navy);
+  font-family: "Caveat", cursive;
+  line-height: 1.15;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  resize: none;
+  width: 600px;
+}
+.write-box:focus { outline: none; }
+.signer-status { background: var(--navy-deep); border-radius: 8px; bottom: 76px; color: var(--white); font-size: .9rem; left: 50%; margin: 0; padding: 8px 14px; position: absolute; transform: translateX(-50%); }
+.signer-status[hidden] { display: none; }
+@media (max-width: 560px) {
+  .signer-hint { order: 3; width: 100%; }
+}
