@@ -65,7 +65,7 @@ Design:
 - **In the book:** the signing spread's two pages each show their half of the sheet scaled to fit (left page = left half, right page = right half). Text is tiny there by design. Clicking/tapping either page opens the signer.
 - **Signer (full-screen overlay):** opened by "Sign the yearbook" (viewer and home page `#sign`) or clicking the signing pages. Starts fitted to screen. Pinch / wheel / trackpad zoom, drag to pan (Panzoom). Tap or click on the sheet without dragging → zooms to scale 1 centred on that spot and puts a text box with a blinking cursor there. Toolbar while writing: A− / A+ (sizes 16, 24, 36, 54, 80 units; default 24), Cancel, Post. Post → saved → box becomes the posted message, view zooms back out to fit. "Back to book" closes the overlay. Keyboard users: a "Write here" button places the box at the centre of the current view.
 - **Limits:** message required, trimmed, 1–280 chars; size one of 16/24/36/54/80; x, y in [0, 1]. Overlap allowed (sheet is big; owner deletes anything bad).
-- **No separate name field** — people sign inside the message ("HAGS! – Charles").
+- **Message only, no name field.** The signer types one message; they may or may not include their name in it.
 - Arrow keys / typing never turn book pages while the overlay is open.
 
 ### Backend
