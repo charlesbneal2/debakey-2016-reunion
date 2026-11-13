@@ -50,7 +50,8 @@ export type TicketMatch = {
   checked_in_at: string | null;
 };
 
-export type Signature = { name: string; message: string; created_at: string };
+export type SignatureInput = { message: string; x: number; y: number; size: number };
+export type Signature = SignatureInput & { created_at: string };
 
 export type Store = ReturnType<typeof createStore>;
 
@@ -81,7 +82,13 @@ export function createStore(rpc: Rpc) {
     doorAuthFailed: (ip: string) => rpc("door_auth_failed", { p_ip: ip }) as Promise<boolean>,
     listSignatures: () => rpc("list_signatures") as Promise<Signature[]>,
     /** Resolves null when this ip hash is rate limited. */
-    addSignature: (name: string, message: string, ipHash: string) =>
-      rpc("add_signature", { p_name: name, p_message: message, p_ip_hash: ipHash }) as Promise<Signature | null>,
+    addSignature: (input: SignatureInput, ipHash: string) =>
+      rpc("add_signature", {
+        p_message: input.message,
+        p_x: input.x,
+        p_y: input.y,
+        p_size: input.size,
+        p_ip_hash: ipHash,
+      }) as Promise<Signature | null>,
   };
 }
