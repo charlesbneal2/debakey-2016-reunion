@@ -1,6 +1,6 @@
 import { assert, assertEquals } from "@std/assert";
 
-const FUNCTIONS = ["create-checkout", "stripe-webhook", "guest-list", "ticket", "door"];
+const FUNCTIONS = ["create-checkout", "stripe-webhook", "guest-list", "ticket", "door", "signatures"];
 
 Deno.test("every function serves unconditionally on Supabase's runtime", async () => {
   for (const name of FUNCTIONS) {

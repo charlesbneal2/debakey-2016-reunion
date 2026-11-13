@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.door]
 verify_jwt = false
+
+[functions.signatures]
+verify_jwt = false

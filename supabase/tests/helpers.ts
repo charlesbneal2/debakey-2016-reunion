@@ -1,6 +1,6 @@
 import { PGlite } from "@electric-sql/pglite";
 
-const MIGRATION = new URL("../migrations/20261105000000_init.sql", import.meta.url);
+const MIGRATIONS = new URL("../migrations/", import.meta.url);
 
 export type Rpc = (fn: string, args?: Record<string, unknown>) => Promise<unknown>;
 
@@ -12,7 +12,8 @@ export async function newDb(): Promise<{ db: PGlite; rpc: Rpc }> {
     create role service_role nologin bypassrls;
     grant usage on schema public to anon, authenticated, service_role;
   `);
-  await db.exec(await Deno.readTextFile(MIGRATION));
+  const files = [...Deno.readDirSync(MIGRATIONS)].map((f) => f.name).filter((n) => n.endsWith(".sql")).sort();
+  for (const file of files) await db.exec(await Deno.readTextFile(new URL(file, MIGRATIONS)));
 
   const rpc: Rpc = async (fn, args = {}) => {
     const names = Object.keys(args);
