@@ -132,19 +132,15 @@ img { max-width: 100%; height: auto; }
 
 /* Yearbook */
 .yearbook { background: var(--surface); border-top: 1px solid var(--border); }
-.spread { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 28px; }
-.spread-photo, .spread-quote, .spread-memory {
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  margin: 0;
-  padding: 16px;
+.yearbook-feature { align-items: center; display: grid; gap: 28px; grid-template-columns: minmax(0, 220px) 1fr; }
+.yearbook-cover img { border-radius: 4px; box-shadow: var(--shadow); display: block; height: auto; transform: rotate(-2deg); width: 100%; }
+.yearbook-lede { color: var(--muted); margin: 12px 0 0; max-width: 34em; }
+.yearbook-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.yearbook .button-quiet { border-color: var(--border); }
+@media (max-width: 560px) {
+  .yearbook-feature { grid-template-columns: 1fr; }
+  .yearbook-cover { justify-self: center; width: 60%; }
 }
-.spread-photo img { border-radius: 6px; display: block; width: 100%; }
-.spread-photo figcaption { color: var(--muted); font-size: .85rem; margin-top: 10px; }
-.spread-quote p { font-size: 1.1rem; margin: 0 0 8px; }
-.spread-quote cite { color: var(--muted); font-size: .85rem; font-style: normal; }
 
 /* Who's coming */
 .guests { border-top: 1px solid var(--border); }

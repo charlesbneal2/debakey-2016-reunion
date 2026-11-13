@@ -38,33 +38,19 @@
   </header>
 
   <main>
-    <!--
-      Yearbook section. Remove the `hidden` attribute once at least one slot is filled in.
-      Uncomment and copy a slot below for each item. Put images in site/assets/.
-    -->
-    <section id="yearbook" class="section yearbook" aria-labelledby="yearbook-title" hidden>
-      <div class="wrap">
-        <p class="eyebrow">From the yearbook</p>
-        <h2 id="yearbook-title">Remember when</h2>
-        <div class="spread">
-          <!-- PHOTO SLOT
-          <figure class="spread-photo">
-            <img src="assets/PHOTO.jpg" alt="DESCRIBE THE PHOTO">
-            <figcaption>CAPTION</figcaption>
-          </figure>
-          -->
-          <!-- QUOTE SLOT
-          <blockquote class="spread-quote">
-            <p>QUOTE</p>
-            <cite>WHO SAID IT</cite>
-          </blockquote>
-          -->
-          <!-- MEMORY SLOT
-          <article class="spread-memory">
-            <h3>TITLE</h3>
-            <p>THE MEMORY</p>
-          </article>
-          -->
+    <section id="yearbook" class="section yearbook" aria-labelledby="yearbook-title">
+      <div class="wrap yearbook-feature">
+        <a class="yearbook-cover" href="yearbook.html">
+          <img src="yearbook/pages/front.webp" width="1044" height="1400" loading="lazy" alt="2016 yearbook cover: From Every Angle">
+        </a>
+        <div>
+          <p class="eyebrow">From the yearbook</p>
+          <h2 id="yearbook-title">Flip through 2016</h2>
+          <p class="yearbook-lede">The whole yearbook, page by page. Then leave your name and a note on the last page, just like back then.</p>
+          <div class="yearbook-actions">
+            <a class="button" href="yearbook.html">Open the yearbook</a>
+            <a class="button button-quiet" href="yearbook.html#sign">Sign the yearbook</a>
+          </div>
         </div>
       </div>
     </section>

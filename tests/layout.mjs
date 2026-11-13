@@ -84,11 +84,14 @@ await test("key facts fit on first screen of a small phone", async (open) => {
   await page.screenshot({ path: join(SHOTS, "cover-360.png") });
 });
 
-await test("yearbook section is hidden until content exists", async (open) => {
+await test("yearbook section links to the book and signing", async (open) => {
   const page = await open();
   await page.goto(BASE);
-  assert.equal(await page.locator("#yearbook").count(), 1);
-  assert.equal(await page.locator("#yearbook").isVisible(), false);
+  const section = page.locator("#yearbook");
+  assert.equal(await section.isVisible(), true);
+  assert.equal(await section.locator('a[href="yearbook.html"]').filter({ hasText: "Open the yearbook" }).count(), 1);
+  assert.equal(await section.locator('a[href="yearbook.html#sign"]').filter({ hasText: "Sign the yearbook" }).count(), 1);
+  assert.ok(await section.locator("img").getAttribute("alt"));
 });
 
 // ponytail: guest list is paused (see index.html); restore its old tests from git history when it comes back.
