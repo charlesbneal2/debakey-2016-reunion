@@ -9,13 +9,14 @@ Let classmates flip through the 2016 DeBakey yearbook on the reunion site, like 
 - Page turning: drag/swipe corner, click/tap edges, prev/next buttons, arrow keys.
 - Desktop shows two-page spreads; phones show one page at a time.
 - "Sign the yearbook" button (on home page and in the viewer) jumps straight to the signing spread.
-- Signing: name + message, visible to everyone immediately.
+- Signing (revised 2026-11-13 after local review): the signing spread is one huge sheet. Tap/click a spot → view zooms way in there → type your message in place, pick its size, post. Everyone sees it at that spot, immediately. Zoom out = whole crowded spread; zoom in to read.
 - Owner removes unwanted signatures by deleting the row in Supabase Table Editor.
 
 ## Non-goals
 - Finger-drawn signatures (follow-up).
 - Approval queue, accounts, editing/deleting own signature.
-- Search, zoom UI beyond browser pinch-zoom, page thumbnails/index.
+- Search, zoom UI on the photographed pages, page thumbnails/index.
+- Ink colours / fonts per signer, moving or editing a posted message.
 - Serving original PDFs.
 
 ## Anti-goals
@@ -51,24 +52,34 @@ Signatures backend had one sensible option: new table + edge function, matching 
 - `yearbook.html#sign` opens directly on the signing spread (home page's sign button uses this).
 - Matches site look (Geist, sky-blue brand, `noindex`).
 
-### Signing spread (two HTML pages inside the book)
-- Left page: "Sign the yearbook" form — name (required, ≤60 chars), message (optional, ≤280 chars), Sign button. Success → signature appears on the right page.
-- Right page: all signatures, newest first, scrolls within the page if long. Styled like handwriting on paper (a handwriting web font is fine).
-- Inputs must still be usable inside the flip widget (taps on form fields don't trigger page turn).
+### Signing sheet (revised)
+Owner rejected the first form-based version: "i was picturing a canvas where you can click in to type your message ... you should be able to zoom in and adjust size of your text", "the page is essentially much larger and then when user clicks in it zooms in a lot ... so theres plenty of space".
+
+Approaches considered:
+- **A. Real DOM text on one big sheet + vendored Panzoom (`@panzoom/panzoom@4.5.1`, ~10 KB) for zoom/pan (picked).** Crisp text at any zoom, native cursor and phone keyboard, later finger-drawing can sit on the same sheet as SVG.
+- B. Same, hand-rolled pinch/zoom — no dependency but fiddly touch code, worse first version on phones.
+- C. Canvas 2D rendering — needs DOM input overlay anyway, own hit-testing, blur between redraws.
+
+Design:
+- **Sheet:** one virtual 6000 × 4000 unit sheet (same shape as an open spread), paper background, faint centre fold line. Each signature = absolutely positioned text at `(x, y)` (fractions 0–1 of the sheet, top-left of the text), font size `size` in sheet units, handwriting font, wraps at max 600 units wide, `white-space: pre-wrap`, built with `textContent`.
+- **In the book:** the signing spread's two pages each show their half of the sheet scaled to fit (left page = left half, right page = right half). Text is tiny there by design. Clicking/tapping either page opens the signer.
+- **Signer (full-screen overlay):** opened by "Sign the yearbook" (viewer and home page `#sign`) or clicking the signing pages. Starts fitted to screen. Pinch / wheel / trackpad zoom, drag to pan (Panzoom). Tap or click on the sheet without dragging → zooms to scale 1 centred on that spot and puts a text box with a blinking cursor there. Toolbar while writing: A− / A+ (sizes 16, 24, 36, 54, 80 units; default 24), Cancel, Post. Post → saved → box becomes the posted message, view zooms back out to fit. "Back to book" closes the overlay. Keyboard users: a "Write here" button places the box at the centre of the current view.
+- **Limits:** message required, trimmed, 1–280 chars; size one of 16/24/36/54/80; x, y in [0, 1]. Overlap allowed (sheet is big; owner deletes anything bad).
+- **No separate name field** — people sign inside the message ("HAGS! – Charles").
+- Arrow keys / typing never turn book pages while the overlay is open.
 
 ### Backend
-- Migration: `signatures (id uuid pk, name text not null, message text, ip_hash text, created_at timestamptz default now())`, RLS on, no anon access, service_role only (same as other tables).
-- Edge function `signatures`: `GET` → `{ signatures: [{name, message, created_at}] }` (no ip_hash); `POST {name, message}` → validates lengths, trims, rejects empty name; rate limit ~5 signatures per IP-hash per hour → 429.
-- Store functions added to `Store` / `live_store.ts`; handler tested with fake store in `supabase/tests/` like existing handlers.
-- Plain text only; rendered with `textContent` (no HTML injection).
-- Owner deletes junk rows in Supabase Table Editor → `signatures`.
+- First migration (already applied to prod): `signatures (id, name, message, ip_hash, created_at)` + `list_signatures` / `add_signature`, RLS on, service_role only.
+- Revision migration: delete existing rows (test data only), drop `name`, `message` becomes required 1–280, add `x`, `y` (double precision, 0–1) and `size` (smallint in 16/24/36/54/80); recreate both functions with the new shape.
+- Edge function `signatures`: `GET` → `{ signatures: [{message, x, y, size, created_at}] }` (no ip_hash, no-store); `POST {message, x, y, size}` → validates and trims; rate limit 5 per IP-hash per hour → 429.
+- Plain text only; rendered with `textContent`. Owner deletes junk rows in Supabase Table Editor → `signatures`.
 
 ### Home page
 - Replace hidden placeholder `#yearbook` section with: front cover thumbnail, "Open the yearbook" → `yearbook.html`, "Sign the yearbook" → `yearbook.html#sign`. Unhide it.
 
 ### Tests
 - `supabase/tests/`: signatures handler (list, add, validation, rate limit).
-- `tests/layout.mjs`: yearbook page loads without errors, no horizontal scroll at phone widths, `#sign` lands on signing form, mocked signature list renders.
+- `tests/layout.mjs`: yearbook page loads without errors, no horizontal scroll at phone widths, `#sign` opens the signer, tap-to-write posts `{message, x, y, size}`, mocked signatures render at their positions.
 
 ### Deploy
 - Owner runs it locally (site served locally + local Supabase or mocked function) and approves before anything is pushed to `master`.
@@ -77,4 +88,5 @@ Signatures backend had one sensible option: new table + edge function, matching 
 ## Left to the builder
 - Exact image size/quality, WebP vs JPEG.
 - Per-spread split offsets.
-- Visual styling of controls and signing pages within site style.
+- Visual styling of controls, toolbar and sheet within site style.
+- Exact zoom limits and animation.
