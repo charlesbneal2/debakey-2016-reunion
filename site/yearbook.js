@@ -89,7 +89,8 @@
   const status = document.getElementById("signer-status");
   const minis = signPages.map((page) => page.querySelector(".sheet-mini"));
 
-  const panzoom = Panzoom(sheet, { canvas: true, origin: "0 0", maxScale: 2, step: 0.2 });
+  // Default (centre) origin: Panzoom's wheel and pinch zoom only keep the focal point steady with it.
+  const panzoom = Panzoom(sheet, { canvas: true, maxScale: 2, step: 0.2 });
   viewport.addEventListener("wheel", panzoom.zoomWithWheel);
 
   let box = null; // the write box while writing
@@ -124,8 +125,12 @@
   });
   signPages.forEach((page) => resizeMinis.observe(page));
 
-  // Panzoom transform is scale(s) translate(x, y) with origin 0 0.
-  function view(scale, x, y) {
+  // Show sheet point (sheetX, sheetY) at the middle of the viewport.
+  // Panzoom's transform is scale(s) translate(t) about the sheet centre C, so a point P lands at
+  // C + s * (P + t - C); solving for the viewport middle M gives t = (M - C) / s + C - P.
+  function centreOn(sheetX, sheetY, scale = 1) {
+    const x = (viewport.clientWidth / 2 - SHEET_W / 2) / scale + SHEET_W / 2 - sheetX;
+    const y = (viewport.clientHeight / 2 - SHEET_H / 2) / scale + SHEET_H / 2 - sheetY;
     panzoom.zoom(scale, { animate: false, force: true });
     panzoom.pan(x, y, { animate: false, force: true });
   }
@@ -133,11 +138,7 @@
   function fit() {
     const scale = Math.min(viewport.clientWidth / SHEET_W, viewport.clientHeight / SHEET_H) * 0.96;
     panzoom.setOptions({ minScale: scale });
-    view(scale, (viewport.clientWidth / scale - SHEET_W) / 2, (viewport.clientHeight / scale - SHEET_H) / 2);
-  }
-
-  function centreOn(sheetX, sheetY, scale = 1) {
-    view(scale, viewport.clientWidth / 2 / scale - sheetX, viewport.clientHeight / 2 / scale - sheetY);
+    centreOn(SHEET_W / 2, SHEET_H / 2, scale);
   }
 
   function toSheet(clientX, clientY) {
@@ -157,6 +158,9 @@
     if (!box) return;
     box.style.height = "auto";
     box.style.height = `${box.scrollHeight}px`;
+    // Keep the bottom of the message on the sheet as it grows.
+    const top = Math.min(parseFloat(box.style.top) || 0, SHEET_H - box.offsetHeight);
+    box.style.top = `${Math.max(0, top)}px`;
   }
 
   function startWriting(sheetX, sheetY) {
@@ -190,32 +194,45 @@
     fit();
   }
 
+  const signJump = document.getElementById("sign-jump");
+  const behind = [document.querySelector(".yb-header"), document.querySelector(".yb-main")];
+  let returnFocus = null;
+
   function openSigner() {
     flip.turnToPage(SIGN);
     update();
+    returnFocus = document.activeElement;
     signer.hidden = false;
+    behind.forEach((el) => (el.inert = true));
     document.body.style.overflow = "hidden";
     if (!box) fit();
+    (box ?? document.getElementById("signer-close")).focus({ preventScroll: true });
   }
 
   function closeSigner() {
     signer.hidden = true;
+    behind.forEach((el) => (el.inert = false));
     document.body.style.overflow = "";
+    (returnFocus?.matches?.("button, a") ? returnFocus : signJump).focus();
   }
 
-  // A tap (not a drag or pinch) on the sheet starts writing there.
+  // A tap (not a drag or pinch) on the sheet starts writing there. Ups/cancels are watched on window
+  // so a drag released outside the viewport doesn't leave a pointer counted as still down.
   let down = null;
-  let pointers = 0;
+  const pointers = new Set();
   viewport.addEventListener("pointerdown", (event) => {
-    pointers++;
-    down = pointers === 1 ? { x: event.clientX, y: event.clientY, t: Date.now() } : null;
+    pointers.add(event.pointerId);
+    down = pointers.size === 1 ? { x: event.clientX, y: event.clientY, t: Date.now() } : null;
   }, true);
-  viewport.addEventListener("pointercancel", () => { pointers = Math.max(0, pointers - 1); down = null; }, true);
-  viewport.addEventListener("pointerup", (event) => {
-    pointers = Math.max(0, pointers - 1);
+  window.addEventListener("pointercancel", (event) => {
+    pointers.delete(event.pointerId);
+    down = null;
+  }, true);
+  window.addEventListener("pointerup", (event) => {
+    pointers.delete(event.pointerId);
     const tap = down && Math.hypot(event.clientX - down.x, event.clientY - down.y) < 6 && Date.now() - down.t < 500;
     down = null;
-    if (!tap || event.target === box) return;
+    if (!tap || !viewport.contains(event.target) || event.target === box) return;
     startWriting(...toSheet(event.clientX, event.clientY));
   }, true);
 
@@ -273,6 +290,16 @@
   document.addEventListener("keydown", (event) => {
     if (!signer.hidden) {
       if (event.key === "Escape") box ? stopWriting() : closeSigner();
+      if (event.key === "Tab") {
+        // Keep focus inside the signer.
+        const focusable = [...signer.querySelectorAll("button:not([disabled]), textarea")].filter((el) => el.offsetParent);
+        const i = focusable.indexOf(document.activeElement);
+        const wrap = event.shiftKey ? i <= 0 : i === focusable.length - 1;
+        if (wrap) {
+          event.preventDefault();
+          focusable[event.shiftKey ? focusable.length - 1 : 0].focus();
+        }
+      }
       return; // never turn book pages while signing
     }
     if (event.target.closest("input, textarea, select, [contenteditable]")) return;

@@ -678,6 +678,63 @@ await test("signature load failure keeps signer usable", async (open) => {
   assert.deepEqual(page.errors, []);
 });
 
+await test("tapping still works after a drag released outside the sheet", async (open) => {
+  const page = await openSigner(open, { width: 1280, height: 800 });
+  const [x, y] = await viewportCentre(page);
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x, 20, { steps: 8 }); // release over the top bar
+  await page.mouse.up();
+  await page.waitForTimeout(200);
+  await tapToWrite(page);
+});
+
+await test("wheel zoom keeps the point under the cursor", async (open) => {
+  const page = await openSigner(open, { width: 1280, height: 800 });
+  const sheetPoint = (cx, cy) =>
+    page.evaluate(([cx, cy]) => {
+      const r = document.querySelector("#sheet").getBoundingClientRect();
+      return [((cx - r.left) / r.width) * 6000, ((cy - r.top) / r.height) * 4000];
+    }, [cx, cy]);
+  const [cx, cy] = [400, 300];
+  const before = await sheetPoint(cx, cy);
+  await page.mouse.move(cx, cy);
+  await page.mouse.wheel(0, -300);
+  await page.waitForTimeout(400);
+  const after = await sheetPoint(cx, cy);
+  const width = await page.locator("#sheet").evaluate((el) => el.getBoundingClientRect().width);
+  assert.ok(width > 1100, `zoomed in (width ${width})`);
+  assert.ok(Math.hypot(after[0] - before[0], after[1] - before[1]) < 30, `${before} -> ${after}`);
+});
+
+await test("big message near the bottom stays on the sheet", async (open) => {
+  const page = await openSigner(open, { width: 1280, height: 800 });
+  const posted = await routePost(page, echo);
+  const box = await page.locator("#sheet").boundingBox();
+  await tapToWrite(page, [box.x + box.width / 2, box.y + box.height - 3]);
+  for (let i = 0; i < 3; i++) await page.locator("#size-up").click();
+  await page.locator("#write-box").fill("long ".repeat(56));
+  await page.locator("#write-post").click();
+  const sig = page.locator("#sheet .signature").first();
+  await sig.waitFor({ state: "attached" });
+  const bottom = await sig.evaluate((el) => el.offsetTop + el.offsetHeight);
+  assert.ok(bottom <= 4000, `bottom ${bottom}, posted y ${posted[0].y}`);
+});
+
+await test("signer takes focus and gives it back", async (open) => {
+  const page = await openBook(open, { width: 1280, height: 800 });
+  await page.locator("#sign-jump").click();
+  await page.locator("#signer").waitFor({ state: "visible" });
+  assert.equal(await page.evaluate(() => document.activeElement.id), "signer-close");
+  for (let i = 0; i < 6; i++) {
+    await page.keyboard.press("Tab");
+    assert.equal(await page.evaluate(() => !!document.activeElement.closest("#signer")), true, `tab ${i}`);
+  }
+  await page.keyboard.press("Escape");
+  await page.locator("#signer").waitFor({ state: "hidden" });
+  assert.equal(await page.evaluate(() => document.activeElement.id), "sign-jump");
+});
+
 await browser.close();
 server.close();
 if (failures) {
