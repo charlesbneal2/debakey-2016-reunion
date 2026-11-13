@@ -76,16 +76,14 @@
   document.getElementById("sign-jump").addEventListener("click", () => openSigner());
 
   // ---- Signing sheet: one big zoomable sheet, messages pinned where people tapped. ----
-  const SHEET_W = 3000;
-  const SHEET_H = 2000;
+  const SHEET_W = 2100;
+  const SHEET_H = 1400;
   const BOX_W = 600; // max message width, sheet units
-  const SIZES = [16, 24, 36, 54, 80];
+  const SIZE = 24; // one text size for everyone; the API still accepts 16/24/36/54/80
   const signer = document.getElementById("signer");
   const viewport = document.getElementById("signer-viewport");
   const sheet = document.getElementById("sheet");
   const tools = document.getElementById("write-tools");
-  const sizeDown = document.getElementById("size-down");
-  const sizeUp = document.getElementById("size-up");
   const postButton = document.getElementById("write-post");
   const status = document.getElementById("signer-status");
   const minis = signPages.map((page) => page.querySelector(".sheet-mini"));
@@ -95,7 +93,6 @@
   viewport.addEventListener("wheel", panzoom.zoomWithWheel);
 
   let box = null; // the write box while writing
-  let sizeIndex = 1;
 
   function showStatus(text) {
     status.textContent = text;
@@ -147,14 +144,6 @@
     return [((clientX - rect.left) / rect.width) * SHEET_W, ((clientY - rect.top) / rect.height) * SHEET_H];
   }
 
-  function setSize(index) {
-    sizeIndex = Math.max(0, Math.min(SIZES.length - 1, index));
-    if (box) box.style.fontSize = `${SIZES[sizeIndex]}px`;
-    sizeDown.disabled = sizeIndex === 0;
-    sizeUp.disabled = sizeIndex === SIZES.length - 1;
-    grow();
-  }
-
   function grow() {
     if (!box) return;
     box.style.height = "auto";
@@ -181,10 +170,11 @@
     }
     box.style.left = `${x}px`;
     box.style.top = `${y}px`;
-    setSize(sizeIndex);
+    box.style.fontSize = `${SIZE}px`;
+    grow();
     tools.hidden = false;
     showStatus("");
-    centreOn(x + BOX_W / 2, y + SIZES[sizeIndex]);
+    centreOn(x + BOX_W / 2, y + SIZE);
     box.focus({ preventScroll: true });
   }
 
@@ -242,8 +232,6 @@
     const [x, y] = toSheet(rect.left + rect.width / 2, rect.top + rect.height / 2);
     startWriting(x - BOX_W / 2, y);
   });
-  sizeDown.addEventListener("click", () => setSize(sizeIndex - 1));
-  sizeUp.addEventListener("click", () => setSize(sizeIndex + 1));
   document.getElementById("write-cancel").addEventListener("click", stopWriting);
   document.getElementById("signer-close").addEventListener("click", closeSigner);
   window.addEventListener("resize", () => {
@@ -263,7 +251,7 @@
       message,
       x: round(parseFloat(box.style.left) / SHEET_W),
       y: round(parseFloat(box.style.top) / SHEET_H),
-      size: SIZES[sizeIndex],
+      size: SIZE,
     };
     postButton.disabled = true;
     try {

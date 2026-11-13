@@ -518,7 +518,7 @@ await test("signatures render at their positions", async (open) => {
   const sig = page.locator("#sheet .signature");
   await sig.waitFor({ state: "attached" });
   const style = await sig.evaluate((el) => [el.style.left, el.style.top, el.style.fontSize, el.textContent]);
-  assert.deepEqual(style, ["1500px", "500px", "36px", "A"]);
+  assert.deepEqual(style, ["1050px", "350px", "36px", "A"]);
   assert.match(await page.locator("#sign-right .sheet-mini").textContent(), /A/);
 });
 
@@ -527,7 +527,7 @@ await test("tap opens write box zoomed in at that spot", async (open) => {
   await tapToWrite(page);
   assert.equal(await page.evaluate(() => document.activeElement.id), "write-box");
   // Panzoom applies transforms on the next animation frame.
-  await page.waitForFunction(() => document.querySelector("#sheet").getBoundingClientRect().width >= 3000 * 0.95);
+  await page.waitForFunction(() => document.querySelector("#sheet").getBoundingClientRect().width >= 2100 * 0.95);
 });
 
 await test("posting sends message, position and size", async (open) => {
@@ -535,13 +535,13 @@ await test("posting sends message, position and size", async (open) => {
   const posted = await routePost(page, echo);
   await tapToWrite(page);
   await page.keyboard.type("HAGS – Jane");
-  await page.locator("#size-up").click();
+  assert.equal(await page.locator("#size-up, #size-down").count(), 0, "no size buttons");
   await page.locator("#write-post").click();
   await page.locator("#sheet .signature").filter({ hasText: "HAGS – Jane" }).waitFor({ state: "attached" });
   assert.equal(posted.length, 1);
   const [body] = posted;
   assert.equal(body.message, "HAGS – Jane");
-  assert.equal(body.size, 36);
+  assert.equal(body.size, 24);
   assert.ok(body.x >= 0 && body.x <= 1 && body.y >= 0 && body.y <= 1, JSON.stringify(body));
   assert.equal("name" in body, false);
   assert.equal(await page.locator("#write-box").count(), 0);
@@ -585,18 +585,6 @@ await test("post button disabled while sending", async (open) => {
   assert.equal(posted.length, 1);
 });
 
-await test("size buttons clamp at smallest and largest", async (open) => {
-  const page = await openSigner(open);
-  await tapToWrite(page);
-  const size = () => page.locator("#write-box").evaluate((el) => getComputedStyle(el).fontSize);
-  for (let i = 0; i < 5; i++) await page.locator("#size-up").click({ force: true });
-  assert.equal(await size(), "80px");
-  assert.equal(await page.locator("#size-up").isDisabled(), true);
-  for (let i = 0; i < 5; i++) await page.locator("#size-down").click({ force: true });
-  assert.equal(await size(), "16px");
-  assert.equal(await page.locator("#size-down").isDisabled(), true);
-});
-
 await test("write-here places box in view", async (open) => {
   const page = await openSigner(open);
   await page.locator("#write-here").click();
@@ -638,7 +626,7 @@ await test("tap near edge keeps box on sheet", async (open) => {
   await page.keyboard.type("edge");
   await page.locator("#write-post").click();
   await page.locator("#sheet .signature").filter({ hasText: "edge" }).waitFor({ state: "attached" });
-  assert.ok(posted[0].x <= 0.8 && posted[0].y <= 0.97, JSON.stringify(posted[0]));
+  assert.ok(posted[0].x <= 0.72 && posted[0].y <= 0.97, JSON.stringify(posted[0]));
 });
 
 await test("typing in write box does not flip", async (open) => {
@@ -694,7 +682,7 @@ await test("wheel zoom keeps the point under the cursor", async (open) => {
   const sheetPoint = (cx, cy) =>
     page.evaluate(([cx, cy]) => {
       const r = document.querySelector("#sheet").getBoundingClientRect();
-      return [((cx - r.left) / r.width) * 3000, ((cy - r.top) / r.height) * 2000];
+      return [((cx - r.left) / r.width) * 2100, ((cy - r.top) / r.height) * 1400];
     }, [cx, cy]);
   const [cx, cy] = [400, 300];
   const before = await sheetPoint(cx, cy);
@@ -703,7 +691,7 @@ await test("wheel zoom keeps the point under the cursor", async (open) => {
   await page.waitForTimeout(400);
   const after = await sheetPoint(cx, cy);
   const width = await page.locator("#sheet").evaluate((el) => el.getBoundingClientRect().width);
-  assert.ok(width > 1060, `zoomed in (width ${width})`);
+  assert.ok(width > 740, `zoomed in (width ${width})`);
   assert.ok(Math.hypot(after[0] - before[0], after[1] - before[1]) < 30, `${before} -> ${after}`);
 });
 
@@ -712,13 +700,12 @@ await test("big message near the bottom stays on the sheet", async (open) => {
   const posted = await routePost(page, echo);
   const box = await page.locator("#sheet").boundingBox();
   await tapToWrite(page, [box.x + box.width / 2, box.y + box.height - 3]);
-  for (let i = 0; i < 3; i++) await page.locator("#size-up").click();
   await page.locator("#write-box").fill("long ".repeat(56));
   await page.locator("#write-post").click();
   const sig = page.locator("#sheet .signature").first();
   await sig.waitFor({ state: "attached" });
   const bottom = await sig.evaluate((el) => el.offsetTop + el.offsetHeight);
-  assert.ok(bottom <= 2000, `bottom ${bottom}, posted y ${posted[0].y}`);
+  assert.ok(bottom <= 1400, `bottom ${bottom}, posted y ${posted[0].y}`);
 });
 
 await test("signer takes focus and gives it back", async (open) => {
