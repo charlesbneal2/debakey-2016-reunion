@@ -8,7 +8,7 @@ import { chromium } from "playwright";
 
 const SITE_DIR = new URL("../site/", import.meta.url).pathname;
 const SHOTS = process.env.SCREENSHOT_DIR ?? tmpdir();
-const TYPES = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".png": "image/png", ".svg": "image/svg+xml" };
+const TYPES = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".png": "image/png", ".svg": "image/svg+xml", ".webp": "image/webp" };
 
 const server = createServer(async (req, res) => {
   const path = new URL(req.url, "http://x").pathname;
@@ -32,7 +32,7 @@ let failures = 0;
 const json = (route, body, status = 200) =>
   route.fulfill({ status, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(body) });
 
-async function newPage({ width = 390, height = 844, now = "2026-11-10T12:00:00Z", guests = [{ name: "Jane Doe", plus_one: false }] } = {}) {
+async function newPage({ width = 390, height = 844, now = "2026-11-10T12:00:00Z", guests = [{ name: "Jane Doe", plus_one: false }], signatures = [] } = {}) {
   const context = await browser.newContext({ viewport: { width, height } });
   context.setDefaultTimeout(4000);
   const page = await context.newPage();
@@ -41,6 +41,8 @@ async function newPage({ width = 390, height = 844, now = "2026-11-10T12:00:00Z"
   await page.clock.setFixedTime(new Date(now));
   await page.route("**/guest-list", (route) =>
     guests === "fail" ? json(route, { error: "down" }, 500) : json(route, { guests }));
+  await page.route("**/signatures", (route) =>
+    signatures === "fail" ? json(route, { error: "down" }, 500) : json(route, { signatures }));
   return page;
 }
 
@@ -410,6 +412,169 @@ await test("door network failure points staff to printed list", async (open) => 
   await page.getByLabel("Find by name").fill("jane");
   await page.getByRole("button", { name: "Search" }).click();
   await page.getByText("printed list").waitFor();
+  assert.deepEqual(page.errors, []);
+});
+
+// --- Yearbook ---
+const SIGS = "**/signatures";
+const SIG = (name, message = "") => ({ name, message, created_at: "2026-11-10T12:00:00Z" });
+const indicator = (page) => page.locator("#page-indicator").textContent();
+
+async function openBook(open, options = {}, hash = "") {
+  const page = await open(options);
+  await page.goto(`${BASE}/yearbook.html${hash}`);
+  await page.locator("#page-indicator").filter({ hasText: /\S/ }).waitFor();
+  return page;
+}
+
+// Routes POST /signatures; GETs fall through to newPage's route. Returns the list of posted bodies.
+async function routePost(page, respond) {
+  const posted = [];
+  await page.route(SIGS, async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    posted.push(route.request().postDataJSON());
+    await respond(route);
+  });
+  return posted;
+}
+
+for (const [width, height] of VIEWPORTS) {
+  await test(`yearbook has no horizontal overflow at ${width}x${height}`, async (open) => {
+    const page = await openBook(open, { width, height });
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: join(SHOTS, `yearbook-${width}.png`) });
+    assert.deepEqual(page.errors, []);
+  });
+}
+
+await test("yearbook opens on front cover and next turns page", async (open) => {
+  const page = await openBook(open, { width: 1280, height: 800 });
+  assert.equal(await page.locator('img[src$="front.webp"]').isVisible(), true);
+  const before = await indicator(page);
+  await page.locator("#next").click();
+  await page.waitForFunction((text) => document.querySelector("#page-indicator").textContent !== text, before);
+  assert.equal(await page.locator('img[src$="001.webp"]').isVisible(), true);
+});
+
+for (const [width, height] of [[390, 844], [1280, 800]]) {
+  await test(`sign link opens on signing form at ${width}`, async (open) => {
+    const page = await openBook(open, { width, height }, "#sign");
+    assert.equal(await page.locator("#sign-name").isVisible(), true);
+    await page.screenshot({ path: join(SHOTS, `yearbook-sign-${width}.png`) });
+  });
+}
+
+await test("sign-jump button goes to signing form", async (open) => {
+  const page = await openBook(open);
+  await page.locator("#sign-jump").click();
+  await page.locator("#sign-name").waitFor({ state: "visible" });
+});
+
+await test("signature list renders newest first", async (open) => {
+  const page = await openBook(open, { width: 1280, height: 800, signatures: [SIG("B", "two"), SIG("A")] }, "#sign");
+  const items = await page.locator("#signature-list li").allTextContents();
+  assert.equal(items.length, 2);
+  assert.match(items[0], /B/);
+  assert.match(items[0], /two/);
+  assert.match(items[1], /A/);
+});
+
+await test("signing posts and shows new signature", async (open) => {
+  const page = await openBook(open, { signatures: [SIG("Old")] }, "#sign");
+  const posted = await routePost(page, (route) => json(route, { signature: SIG("Jane", "hi") }, 201));
+  await page.locator("#sign-name").fill("Jane");
+  await page.locator("#sign-message").fill("hi");
+  await page.locator("#sign-submit").click();
+  await page.locator("#signature-list li").first().filter({ hasText: "Jane" }).waitFor({ state: "attached" });
+  assert.deepEqual(posted, [{ name: "Jane", message: "hi" }]);
+  // Phones flip to the list after signing; StPageFlip clones the page during the flip.
+  await page.waitForFunction(() => document.querySelectorAll("#sign-name").length === 1);
+  assert.equal(await page.locator("#sign-name").inputValue(), "");
+  assert.equal(await page.locator("#sign-message").inputValue(), "");
+});
+
+await test("yearbook blank name is stopped before any request", async (open) => {
+  const page = await openBook(open, {}, "#sign");
+  const posted = await routePost(page, (route) => json(route, { signature: SIG("x") }, 201));
+  await page.locator("#sign-name").fill("   ");
+  await page.locator("#sign-submit").click();
+  await page.locator("#sign-status").waitFor({ state: "visible" });
+  assert.deepEqual(posted, []);
+});
+
+await test("429 shows try-later message and re-enables button", async (open) => {
+  const page = await openBook(open, {}, "#sign");
+  await routePost(page, (route) => json(route, { error: "Too many signatures. Try again later." }, 429));
+  await page.locator("#sign-name").fill("Jane");
+  await page.locator("#sign-submit").click();
+  await page.locator("#sign-status").filter({ hasText: /later/i }).waitFor();
+  assert.equal(await page.locator("#sign-submit").isEnabled(), true);
+});
+
+await test("typing in sign form does not flip", async (open) => {
+  const page = await openBook(open, {}, "#sign");
+  const before = await indicator(page);
+  await page.locator("#sign-message").click();
+  await page.keyboard.type("hello world");
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("ArrowRight");
+  await page.waitForTimeout(1200);
+  assert.equal(await indicator(page), before);
+  assert.equal(await page.locator("#sign-name").isVisible(), true);
+});
+
+await test("arrow keys flip when not typing", async (open) => {
+  const page = await openBook(open, { width: 1280, height: 800 });
+  const before = await indicator(page);
+  await page.keyboard.press("ArrowRight");
+  await page.waitForFunction((text) => document.querySelector("#page-indicator").textContent !== text, before);
+});
+
+await test("long signature wraps", async (open) => {
+  const sigs = [SIG("x".repeat(60), "a".repeat(280)), SIG("Link", `https://example.com/${"b".repeat(250)}`)];
+  for (const [width, height] of [[1280, 800], [360, 640]]) {
+    const page = await openBook(open, { width, height, signatures: sigs }, "#sign");
+    const list = page.locator("#signature-list");
+    assert.equal(await list.evaluate((el) => el.scrollWidth <= el.clientWidth), true, `list at ${width}`);
+    assert.equal(await noOverflow(page), true, `page at ${width}`);
+    await page.context().close();
+  }
+});
+
+await test("signature text is literal", async (open) => {
+  const page = await openBook(open, { width: 1280, height: 800, signatures: [SIG("<b>x</b>", "<img src=x onerror=alert(1)>")] }, "#sign");
+  const item = page.locator("#signature-list li").first();
+  assert.match(await item.textContent(), /<b>x<\/b>/);
+  assert.equal(await page.locator("#signature-list b, #signature-list img").count(), 0);
+});
+
+await test("sign button disabled while sending", async (open) => {
+  const page = await openBook(open, {}, "#sign");
+  let release;
+  const gate = new Promise((resolve) => (release = resolve));
+  const posted = await routePost(page, async (route) => {
+    await gate;
+    await json(route, { signature: SIG("Jane") }, 201);
+  });
+  await page.locator("#sign-name").fill("Jane");
+  await page.locator("#sign-submit").dblclick();
+  assert.equal(await page.locator("#sign-submit").isDisabled(), true);
+  release();
+  await page.locator("#sign-submit").and(page.locator(":enabled")).waitFor();
+  assert.equal(posted.length, 1);
+});
+
+await test("signature load failure keeps book usable", async (open) => {
+  const page = await openBook(open, { width: 1280, height: 800, signatures: "fail" }, "#sign");
+  await page.getByText("Couldn't load signatures").waitFor();
+  const posted = await routePost(page, (route) => json(route, { signature: SIG("Jane") }, 201));
+  await page.locator("#sign-name").fill("Jane");
+  await page.locator("#sign-submit").click();
+  await page.locator("#signature-list li").filter({ hasText: "Jane" }).waitFor();
+  assert.equal(posted.length, 1);
+  const before = await indicator(page);
+  await page.locator("#prev").click();
+  await page.waitForFunction((text) => document.querySelector("#page-indicator").textContent !== text, before);
   assert.deepEqual(page.errors, []);
 });
 
