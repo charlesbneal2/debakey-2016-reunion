@@ -79,8 +79,6 @@ img { max-width: 100%; height: auto; }
 .seal {
   width: clamp(96px, 24svh, 200px);
   height: auto;
-  border-radius: 16px;
-  box-shadow: 0 0 0 1px rgb(11 24 70 / 10%), 0 20px 50px -12px rgb(11 24 70 / 40%);
 }
 
 .cover h1 { font-size: clamp(2.1rem, min(9vw, 7svh), 4rem); letter-spacing: -.04em; }
@@ -260,7 +258,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .panel h1 { font-size: clamp(1.5rem, 6vw, 1.85rem); overflow-wrap: anywhere; }
 .panel p { margin: 12px 0; }
 .panel .button { margin-top: 8px; }
-.seal-small { border-radius: 12px; display: block; height: auto; margin: 0 auto 18px; width: 88px; }
+.seal-small { display: block; height: auto; margin: 0 auto 18px; width: 88px; }
 .event-line { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: .92rem; font-weight: 500; padding: 12px; }
 .qr { border: 1px solid var(--border); border-radius: 10px; display: block; height: auto; margin: 16px auto; max-width: 100%; }
 

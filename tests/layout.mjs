@@ -8,7 +8,7 @@ import { chromium } from "playwright";
 
 const SITE_DIR = new URL("../site/", import.meta.url).pathname;
 const SHOTS = process.env.SCREENSHOT_DIR ?? tmpdir();
-const TYPES = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".png": "image/png" };
+const TYPES = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".png": "image/png", ".svg": "image/svg+xml" };
 
 const server = createServer(async (req, res) => {
   const path = new URL(req.url, "http://x").pathname;
