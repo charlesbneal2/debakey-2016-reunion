@@ -59,8 +59,8 @@ export async function buildTicketEmail(order: StoredOrder, siteUrl: string): Pro
 
   const html = `
     <div style="font-family:Geist,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:520px;margin:auto;color:#09090b;font-size:15px;line-height:1.6">
-      <div style="background:#0b1846;color:#fff;padding:28px 24px;text-align:center;border-radius:12px">
-        <div style="font-size:13px;font-weight:500;color:#c9d4ff">Class of 2016 &middot; Ten Years</div>
+      <div style="background:#a2bffe;color:#0b1846;padding:28px 24px;text-align:center;border-radius:12px">
+        <div style="font-size:13px;font-weight:500;color:#12266b">Class of 2016 &middot; Ten Years</div>
         <h1 style="margin:8px 0 0;font-size:28px;font-weight:600;letter-spacing:-0.03em">The Ten-Year Reunion</h1>
       </div>
       <p>You're in, ${escapeHtml(order.buyer_name)}! Show ${order.tickets.length > 1 ? "these QR codes" : "this QR code"} at the door.</p>

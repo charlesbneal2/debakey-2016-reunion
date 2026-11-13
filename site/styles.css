@@ -4,6 +4,7 @@
   --navy-deep: #0b1846;
   --royal: #2f49c9;
   --pale: #c9d4ff;
+  --sky: #a2bffe;
   --background: #fff;
   --surface: #fafafa;
   --foreground: #09090b;
@@ -41,14 +42,13 @@ img { max-width: 100%; height: auto; }
 [hidden] { display: none !important; }
 
 :focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
-.cover :focus-visible { outline-color: var(--white); }
 
 /* Cover */
 .cover {
   background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgb(47 73 201 / 45%), transparent 70%),
-    var(--navy-deep);
-  color: var(--white);
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgb(255 255 255 / 40%), transparent 70%),
+    var(--sky);
+  color: var(--navy-deep);
 }
 
 .cover-inner {
@@ -67,10 +67,10 @@ img { max-width: 100%; height: auto; }
 .cover p { margin: 0; }
 
 .kicker {
-  border: 1px solid rgb(255 255 255 / 18%);
+  border: 1px solid rgb(11 24 70 / 15%);
   border-radius: 999px;
-  background: rgb(255 255 255 / 6%);
-  color: var(--pale);
+  background: rgb(255 255 255 / 35%);
+  color: var(--navy);
   font-size: .78rem;
   font-weight: 500;
   padding: 4px 12px;
@@ -80,21 +80,21 @@ img { max-width: 100%; height: auto; }
   width: clamp(96px, 24svh, 200px);
   height: auto;
   border-radius: 16px;
-  box-shadow: 0 0 0 1px rgb(255 255 255 / 12%), 0 20px 50px -12px rgb(0 0 0 / 60%);
+  box-shadow: 0 0 0 1px rgb(11 24 70 / 10%), 0 20px 50px -12px rgb(11 24 70 / 40%);
 }
 
 .cover h1 { font-size: clamp(2.1rem, min(9vw, 7svh), 4rem); letter-spacing: -.04em; }
-.school { color: var(--pale); font-size: clamp(.9rem, 2.4vw, 1.05rem); }
+.school { color: var(--navy); font-size: clamp(.9rem, 2.4vw, 1.05rem); }
 .facts {
   display: grid;
   gap: 2px;
-  color: rgb(255 255 255 / 88%);
+  color: rgb(11 24 70 / 88%);
   font-size: clamp(.9rem, 2.4vw, 1rem);
 }
 .facts br { display: none; }
 .closed-note { font-weight: 600; }
-.cover-contact { color: rgb(201 212 255 / 80%); font-size: .82rem; }
-.cover-contact a { color: var(--white); white-space: nowrap; }
+.cover-contact { color: rgb(11 24 70 / 75%); font-size: .82rem; }
+.cover-contact a { color: var(--navy-deep); white-space: nowrap; }
 .cover .button { margin-top: 6px; }
 
 /* Buttons */
