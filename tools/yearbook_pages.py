@@ -18,6 +18,8 @@ PARTS = [(1, range(0, 24), True), (2, range(0, 24), False), (3, range(0, 11), Tr
 COVERS = {"front": (3, 11), "back": (3, 12)}
 # Gutter nudges in output px, keyed by 1-based spread number. + moves the split right.
 OFFSETS: dict[int, int] = {30: -60, 31: -62, 32: -55, 33: -25, 39: -25}
+# Px trimmed off a left page's outer edge, keyed by page number (117: handwritten note).
+TRIM_LEFT: dict[int, int] = {117: 75}
 
 
 def render(doc, index, rotate, height):
@@ -44,7 +46,8 @@ def main(src="yearbook", out="site/yearbook/pages"):
             spread += 1
             img = render(docs[part], index, rotate, HEIGHT)
             cut = img.width // 2 + OFFSETS.get(spread, 0)
-            img.crop((0, 0, cut, img.height)).save(out / f"{2 * spread - 1:03}.webp", quality=QUALITY)
+            left = 2 * spread - 1
+            img.crop((TRIM_LEFT.get(left, 0), 0, cut, img.height)).save(out / f"{left:03}.webp", quality=QUALITY)
             img.crop((cut, 0, img.width, img.height)).save(out / f"{2 * spread:03}.webp", quality=QUALITY)
             print(f"spread {spread} ({part}#{index})", file=sys.stderr)
 
