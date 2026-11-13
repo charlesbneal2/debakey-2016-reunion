@@ -39,6 +39,7 @@
     showCover: true,
     flippingTime: 700,
     mobileScrollSupport: false,
+    showPageCorners: false, // owner found the hover corner-fold hint distracting
   });
   flip.loadFromHTML(pages);
 
