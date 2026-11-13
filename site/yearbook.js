@@ -75,8 +75,8 @@
   document.getElementById("sign-jump").addEventListener("click", () => openSigner());
 
   // ---- Signing sheet: one big zoomable sheet, messages pinned where people tapped. ----
-  const SHEET_W = 6000;
-  const SHEET_H = 4000;
+  const SHEET_W = 3000;
+  const SHEET_H = 2000;
   const BOX_W = 600; // max message width, sheet units
   const SIZES = [16, 24, 36, 54, 80];
   const signer = document.getElementById("signer");

@@ -326,9 +326,9 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .button-quiet { background: var(--white); color: var(--navy); }
 .button-quiet:hover { background: #eef1fb; }
 
-/* Signing sheet: one 6000x4000 sheet; in the book each page shows half of it */
+/* Signing sheet: one 3000x2000 sheet; in the book each page shows half of it */
 .yb-book .page-paper { background: #fffdf6; cursor: zoom-in; }
-.sheet-mini { height: 4000px; left: 0; pointer-events: none; position: absolute; top: 0; transform-origin: 0 0; width: 6000px; }
+.sheet-mini { height: 2000px; left: 0; pointer-events: none; position: absolute; top: 0; transform-origin: 0 0; width: 3000px; }
 .signature {
   color: var(--navy);
   font-family: "Caveat", cursive;
@@ -348,13 +348,13 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .signer-tools .button { min-width: 52px; padding: 0 16px; }
 .signer-viewport { cursor: crosshair; flex: 1; min-height: 0; overflow: hidden; position: relative; touch-action: none; }
 .sheet {
-  background: #fffdf6 linear-gradient(90deg, transparent 2990px, rgb(0 0 0 / 6%) 3000px, transparent 3010px);
+  background: #fffdf6 linear-gradient(90deg, transparent 1494px, rgb(0 0 0 / 6%) 1500px, transparent 1506px);
   box-shadow: var(--shadow);
-  height: 4000px;
+  height: 2000px;
   left: 0;
   position: absolute;
   top: 0;
-  width: 6000px;
+  width: 3000px;
 }
 .write-box {
   background: rgb(255 255 255 / 70%);
