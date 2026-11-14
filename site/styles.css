@@ -318,7 +318,8 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .yb-back { color: var(--navy-deep); font-size: .95rem; font-weight: 500; }
 .yb-main { padding: 0 16px 24px; }
 /* Two pages are 1.5x as wide as they are tall: keep the open book within the viewport height. */
-.yb-book-wrap { margin: 0 auto; max-width: min(1100px, calc((100vh - 150px) * 1.5)); }
+/* Clip the flip animation: the turning page and its shadows are rotated boxes that poke past the book and would add scrollbars. */
+.yb-book-wrap { margin: 0 auto; max-width: min(1100px, calc((100vh - 150px) * 1.5)); overflow: hidden; }
 .yb-book .page { background: var(--white); overflow: hidden; }
 .yb-book .page img { display: block; height: 100%; object-fit: cover; width: 100%; }
 .yb-controls { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 14px auto 0; max-width: 1100px; }

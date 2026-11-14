@@ -25,7 +25,8 @@ const server = createServer(async (req, res) => {
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 const BASE = `http://127.0.0.1:${server.address().port}`;
 
-const browser = await chromium.launch();
+// Full Chromium, not the headless shell: the shell skips the page-flip overflow the yearbook tests check for.
+const browser = await chromium.launch({ channel: "chromium" });
 const VIEWPORTS = [[360, 640], [390, 844], [1280, 800]];
 let failures = 0;
 
@@ -466,6 +467,29 @@ await test("arrow keys flip when not typing", async (open) => {
   await page.waitForFunction((text) => document.querySelector("#page-indicator").textContent !== text, before);
 });
 
+await test("no scrollbars while arrow keys flip interior pages", async (open) => {
+  const page = await openBook(open, { width: 1280, height: 720 });
+  const flip = async (key) => {
+    const before = await indicator(page);
+    await page.keyboard.press(key);
+    await page.waitForFunction((text) => document.querySelector("#page-indicator").textContent !== text, before);
+    await page.waitForTimeout(900); // let the 700 ms animation finish
+  };
+  await flip("ArrowRight"); // off the hard cover; soft interior pages cast the big shadows
+  // Record the worst page overflow on every frame from here on.
+  await page.evaluate(() => {
+    window.worst = { w: 0, h: 0 };
+    const el = document.documentElement;
+    (function tick() {
+      worst.w = Math.max(worst.w, el.scrollWidth - el.clientWidth);
+      worst.h = Math.max(worst.h, el.scrollHeight - el.clientHeight);
+      requestAnimationFrame(tick);
+    })();
+  });
+  await flip("ArrowRight");
+  await flip("ArrowLeft");
+  assert.deepEqual(await page.evaluate(() => worst), { w: 0, h: 0 });
+});
 
 // --- Yearbook signing sheet ---
 async function openSigner(open, options = {}) {
