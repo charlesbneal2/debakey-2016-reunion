@@ -367,7 +367,9 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .yearbook-page .signer-bar .glass { border-radius: 999px; }
 .signer-hint { color: var(--ink-2); font-size: .85rem; margin: 0; text-align: center; }
 .signer-tools { border-radius: 999px; bottom: max(16px, env(safe-area-inset-bottom)); display: flex; gap: 2px; left: 50%; padding: 5px; position: absolute; transform: translateX(-50%); }
-.yearbook-page .yearbook-page .pill-solid, .yearbook-page .pill-solid:hover { background: var(--solid); color: var(--solid-ink); }
+/* Cancel/Post float over the cream sheet, so they need navy ink. */
+.yearbook-page .signer-tools .pill-button { color: var(--navy); }
+.yearbook-page .signer-tools .pill-solid { font-weight: 600; }
 .signer-viewport { cursor: crosshair; flex: 1; min-height: 0; overflow: hidden; position: relative; touch-action: none; }
 .sheet { background: #fffdf6 linear-gradient(90deg, transparent 1046px, rgb(0 0 0 / 6%) 1050px, transparent 1054px); box-shadow: var(--sheet-shadow); height: 1400px; left: 0; position: absolute; top: 0; width: 2100px; }
 .write-box { background: rgb(255 255 255 / 70%); border: 2px dashed var(--royal); border-radius: 6px; color: var(--navy); font-family: "Caveat", cursive; line-height: 1.15; overflow: hidden; padding: 0; position: absolute; resize: none; width: 600px; }
