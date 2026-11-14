@@ -90,9 +90,12 @@ await test("yearbook section links to the book and signing", async (open) => {
   await page.goto(BASE);
   const section = page.locator("#yearbook");
   assert.equal(await section.isVisible(), true);
-  assert.equal(await section.locator('a[href="yearbook.html"]').filter({ hasText: "Open the yearbook" }).count(), 1);
-  assert.equal(await section.locator('a[href="yearbook.html#sign"]').filter({ hasText: "Sign the yearbook" }).count(), 1);
+  assert.equal(await section.locator('a[href="yearbook.html"]').filter({ hasText: /^Open$/ }).count(), 1);
+  assert.equal(await section.locator('a[href="yearbook.html#sign"]').filter({ hasText: "Sign it" }).count(), 1);
+  assert.equal(await section.getByRole("link", { name: "The 2016 Yearbook" }).count(), 1); // the book itself links to the viewer
   assert.ok(await section.locator("img").getAttribute("alt"));
+  assert.equal(await page.getByText("leave your name and a note").count(), 0);
+  assert.equal(await page.locator(".faces img").count(), 4);
 });
 
 // ponytail: guest list is paused (see index.html); restore its old tests from git history when it comes back.
@@ -227,8 +230,8 @@ await test("page has share tags, contact link, and logo alt text", async (open) 
   }
   assert.match(await page.locator('meta[property="og:image"]').getAttribute("content"), /^https:\/\/debakey2016reunion\.com\//);
   assert.ok(await page.locator('a[href="mailto:info@debakey2016reunion.com"]').count());
-  assert.match(await page.locator("#cover img").getAttribute("alt"), /DeBakey/);
-  const loaded = await page.locator("#cover img").evaluate((img) => img.decode().then(() => img.naturalWidth));
+  assert.match(await page.locator("#cover img.seal").getAttribute("alt"), /DeBakey/);
+  const loaded = await page.locator("#cover img.seal").evaluate((img) => img.decode().then(() => img.naturalWidth));
   assert.ok(loaded > 0, "logo image loads");
 });
 

@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="en">
+<!-- THEME: "daylight" or "midnight". This one attribute is the whole switch; there is no visitor-facing toggle. -->
+<html lang="en" data-theme="daylight">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,21 +18,31 @@
   <link rel="icon" href="assets/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="home">
   <header id="cover" class="cover">
+    <div class="faces" aria-hidden="true">
+      <div class="faces-track">
+        <img src="assets/faces-1.webp" width="13090" height="144" alt="" decoding="async">
+        <img src="assets/faces-1.webp" width="13090" height="144" alt="" decoding="async">
+      </div>
+      <div class="faces-track">
+        <img src="assets/faces-2.webp" width="13090" height="144" alt="" decoding="async">
+        <img src="assets/faces-2.webp" width="13090" height="144" alt="" decoding="async">
+      </div>
+    </div>
     <div class="cover-inner">
-      <p class="kicker">Class of 2016 &middot; Ten Years</p>
+      <p class="kicker glass">Class of 2016 &middot; Ten Years</p>
       <img class="seal" src="assets/logo.svg" width="343" height="325" alt="DeBakey High School for Health Professions logo">
-      <h1>The Ten-Year Reunion</h1>
+      <h1>The Ten&#8209;Year <em>Reunion</em></h1>
       <p class="school">DeBakey High School for Health Professions</p>
-      <p class="facts">
-        <span>Saturday, November 28, 2026 &middot; 6&ndash;9 PM</span><br>
-        <span>Eureka Heights Brewery &middot; 941 W 18th St, Houston, TX 77008</span>
-      </p>
-      <a id="cover-cta" class="button button-light" href="#tickets">Get Tickets &middot; $15</a>
+      <div class="facts glass">
+        <div><small>When</small><b>Saturday, November 28, 2026</b><span>6&ndash;9 PM</span></div>
+        <div><small>Where</small><b>Eureka Heights Brewery</b><span>941 W 18th St, Houston, TX 77008</span></div>
+      </div>
+      <a id="cover-cta" class="button" href="#tickets">Get Tickets &middot; $15</a>
       <p id="cover-closed" class="closed-note" hidden>Ticket sales have closed.</p>
       <p class="cover-contact">Questions? <a href="mailto:info@debakey2016reunion.com">info@debakey2016reunion.com</a></p>
     </div>
@@ -39,19 +50,13 @@
 
   <main>
     <section id="yearbook" class="section yearbook" aria-labelledby="yearbook-title">
-      <div class="wrap yearbook-feature">
-        <a class="yearbook-cover" href="yearbook.html">
-          <img src="yearbook/pages/front.webp" width="1044" height="1400" loading="lazy" alt="2016 yearbook cover: From Every Angle">
-        </a>
-        <div>
-          <p class="eyebrow">From the yearbook</p>
-          <h2 id="yearbook-title">Flip through 2016</h2>
-          <p class="yearbook-lede">The whole yearbook, page by page. Then leave your name and a note on the last page, just like back then.</p>
-          <div class="yearbook-actions">
-            <a class="button" href="yearbook.html">Open the yearbook</a>
-            <a class="button button-quiet" href="yearbook.html#sign">Sign the yearbook</a>
-          </div>
-        </div>
+      <a class="book-link" href="yearbook.html" aria-labelledby="yearbook-title">
+        <div class="book"><img src="yearbook/pages/front.webp" width="1044" height="1400" loading="lazy" alt="2016 yearbook cover: From Every Angle"></div>
+      </a>
+      <h2 id="yearbook-title" class="book-title">The 2016 Yearbook</h2>
+      <div class="yearbook-actions">
+        <a class="button button-glass glass" href="yearbook.html">Open</a>
+        <a class="button button-glass glass" href="yearbook.html#sign">Sign it</a>
       </div>
     </section>
 
@@ -66,11 +71,10 @@
 
     <section id="tickets" class="section tickets" aria-labelledby="tickets-title">
       <div class="wrap wrap-narrow">
-        <p class="eyebrow">Admission</p>
         <h2 id="tickets-title">Get your tickets</h2>
-        <p class="muted">Tickets are $15 each and include entry and one free drink. We'll email a QR code for each person to show at the door.</p>
+        <p class="muted">$15 each, with entry and one free drink. We'll email a QR code for each person to show at the door.</p>
 
-        <form id="ticket-form" class="ticket-form" novalidate>
+        <form id="ticket-form" class="ticket-form glass" novalidate>
           <fieldset>
             <legend>Who's coming with you?</legend>
             <label class="choice"><input type="radio" name="party" value="solo" checked> <span>Just me, $15</span></label>
@@ -99,12 +103,8 @@
   </main>
 
   <footer id="questions" class="questions">
-    <div class="wrap">
-      <h2>Questions?</h2>
-      <p>Email <a href="mailto:info@debakey2016reunion.com">info@debakey2016reunion.com</a>.</p>
-      <p><a href="https://www.google.com/maps/search/?api=1&amp;query=Eureka+Heights+Brewery+941+W+18th+St+Houston+TX+77008" target="_blank" rel="noopener">Find Eureka Heights Brewery on the map</a></p>
-      <p><a href="privacy">Privacy</a></p>
-    </div>
+    <p>Questions? <a href="mailto:info@debakey2016reunion.com">info@debakey2016reunion.com</a></p>
+    <p><a href="https://www.google.com/maps/search/?api=1&amp;query=Eureka+Heights+Brewery+941+W+18th+St+Houston+TX+77008" target="_blank" rel="noopener">Find Eureka Heights Brewery on the map</a> &middot; <a href="privacy">Privacy</a></p>
   </footer>
 
   <script src="config.js"></script>
