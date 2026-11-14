@@ -13,47 +13,42 @@
 </head>
 <body class="yearbook-page">
   <header class="yb-header">
-    <a href="./" class="yb-back">&larr; Reunion home</a>
-    <h1>2016 Yearbook</h1>
+    <a href="./" class="yb-back icon-button glass" aria-label="Reunion home"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <h1 class="sr-only">2016 Yearbook</h1>
   </header>
 
   <main class="yb-main">
     <div class="yb-book-wrap">
       <div id="book" class="yb-book">
-        <div class="page page-cover" data-density="hard">
-          <img src="yearbook/pages/front.webp" alt="Yearbook front cover: From Every Angle">
-        </div>
+        <div class="page page-cover" data-density="hard"><img src="yearbook/pages/front.webp" alt="Yearbook front cover: From Every Angle"></div>
         <!-- yearbook.js inserts the 118 interior pages here -->
         <div class="page page-paper page-sign" id="sign-left" title="Open to sign the yearbook"><div class="sheet-mini"></div></div>
         <div class="page page-paper page-sign" id="sign-right" title="Open to sign the yearbook"><div class="sheet-mini"></div></div>
-        <div class="page page-cover" data-density="hard">
-          <img src="yearbook/pages/back.webp" alt="Yearbook back cover">
-        </div>
+        <div class="page page-cover" data-density="hard"><img src="yearbook/pages/back.webp" alt="Yearbook back cover"></div>
       </div>
     </div>
 
-    <nav class="yb-controls" aria-label="Yearbook pages">
-      <button id="prev" class="button button-quiet" type="button" aria-label="Previous page">&lsaquo; Prev</button>
+    <nav class="yb-controls glass" aria-label="Yearbook pages">
+      <button id="prev" class="icon-button" type="button" aria-label="Previous page"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
       <span id="page-indicator" class="yb-indicator" aria-live="polite"></span>
-      <button id="next" class="button button-quiet" type="button" aria-label="Next page">Next &rsaquo;</button>
-      <button id="sign-jump" class="button" type="button">Sign the yearbook</button>
+      <button id="next" class="icon-button" type="button" aria-label="Next page"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+      <span class="yb-sep" aria-hidden="true"></span>
+      <button id="sign-jump" class="pill-button" type="button"><svg viewBox="0 0 24 24"><path d="M4 20l4-1L19 8l-3-3L5 16l-1 4zM14 7l3 3"/></svg>Sign</button>
     </nav>
   </main>
 
   <div id="signer" class="signer" role="dialog" aria-modal="true" aria-label="Sign the yearbook" hidden>
     <div class="signer-bar">
-      <button id="signer-close" class="button button-quiet" type="button">&larr; Back to book</button>
+      <button id="signer-close" class="pill-button glass" type="button"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Book</button>
       <p class="signer-hint">Tap anywhere to write. Pinch or scroll to zoom.</p>
-      <button id="write-here" class="button" type="button">Write here</button>
+      <button id="write-here" class="pill-button glass" type="button">Write here</button>
     </div>
-    <div id="signer-viewport" class="signer-viewport">
-      <div id="sheet" class="sheet"></div>
+    <div id="signer-viewport" class="signer-viewport"><div id="sheet" class="sheet"></div></div>
+    <div id="write-tools" class="signer-tools glass" hidden>
+      <button id="write-cancel" class="pill-button" type="button">Cancel</button>
+      <button id="write-post" class="pill-button pill-solid" type="button">Post</button>
     </div>
-    <div id="write-tools" class="signer-tools" hidden>
-      <button id="write-cancel" class="button button-quiet" type="button">Cancel</button>
-      <button id="write-post" class="button" type="button">Post</button>
-    </div>
-    <p id="signer-status" class="signer-status" role="status" hidden></p>
+    <p id="signer-status" class="signer-status glass" role="status" hidden></p>
   </div>
 
   <script src="config.js"></script>

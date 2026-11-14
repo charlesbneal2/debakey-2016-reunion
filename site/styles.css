@@ -299,71 +299,82 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
   .button, .choice, .field input { transition: none; }
 }
 
-/* Yearbook viewer */
-.yearbook-page { background: var(--sky); min-height: 100vh; }
-.yb-header { align-items: baseline; display: flex; flex-wrap: wrap; gap: 4px 16px; justify-content: space-between; margin: 0 auto; max-width: 1100px; padding: 14px 16px 8px; }
-.yb-header h1 { color: var(--navy-deep); font-size: 1.25rem; }
-.yb-back { color: var(--navy-deep); font-size: .95rem; font-weight: 500; }
-.yb-main { padding: 0 16px 24px; }
-/* Two pages are 1.5x as wide as they are tall: keep the open book within the viewport height. */
-/* Clip the flip animation: the turning page and its shadows are rotated boxes that poke past the book and would add scrollbars. */
-.yb-book-wrap { margin: 0 auto; max-width: min(1100px, calc((100vh - 150px) * 1.5)); overflow: hidden; }
-.yb-book .page { background: var(--white); overflow: hidden; }
-.yb-book .page img { display: block; height: 100%; object-fit: cover; width: 100%; }
-.yb-controls { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 14px auto 0; max-width: 1100px; }
-.yb-indicator { color: var(--navy-deep); font-size: .92rem; font-weight: 500; min-width: 9.5em; text-align: center; }
-.button-quiet { background: var(--white); color: var(--navy); }
-.button-quiet:hover { background: #eef1fb; }
+/* Yearbook viewer and signer: always dark, ignores data-theme */
+.yearbook-page {
+  --ink: #f2f3f7;
+  --ink-2: rgb(242 243 247 / 62%);
+  --base: #0b0c11;
+  --glass-a: rgb(255 255 255 / 14%);
+  --glass-b: rgb(255 255 255 / 5%);
+  --glass-edge: rgb(255 255 255 / 16%);
+  --glass-hi: rgb(255 255 255 / 28%);
+  --glass-shadow: rgb(0 0 0 / 70%);
+  --glass-solid: #2a2d38;
+  --hover: rgb(255 255 255 / 12%);
+  --sheet-shadow: 0 30px 80px rgb(0 0 0 / 60%);
+  --solid: #f2f3f7;
+  --solid-ink: #0b0c11;
+  --navy: #12266b;
+  --royal: #2f49c9;
+  --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --stage: radial-gradient(120% 85% at 50% 38%, #262a36 0, #12141b 52%, #050609 100%);
+  color-scheme: dark;
+  background: var(--base) var(--stage) fixed; color: var(--ink); min-height: 100dvh;
+}
+.yearbook-page [hidden] { display: none !important; }
+.yearbook-page :focus-visible { outline: 2px solid #5b7fe8; outline-offset: 2px; }
+.yearbook-page .sr-only { clip-path: inset(50%); height: 1px; overflow: hidden; position: absolute; white-space: nowrap; width: 1px; }
+/* glass on a dark neutral stage */
+.yearbook-page .glass {
+  background: linear-gradient(135deg, var(--glass-a), var(--glass-b));
+  border: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-hi), 0 12px 32px -12px var(--glass-shadow);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .yearbook-page .glass { background: var(--glass-solid); } }
 
-/* Signing sheet: one 2100x1400 sheet; in the book each page shows half of it */
+.yearbook-page .icon-button, .yearbook-page .pill-button {
+  align-items: center; background: none; border: 0; border-radius: 999px; color: var(--ink); cursor: pointer;
+  display: inline-flex; font: 500 .88rem/1 var(--sans); gap: 8px; height: 44px; justify-content: center; text-decoration: none;
+  transition: background-color .2s, transform .2s;
+}
+.yearbook-page .icon-button { width: 44px; }
+.yearbook-page .pill-button { padding: 0 16px; }
+.yearbook-page .icon-button:hover, .yearbook-page .pill-button:hover { background: var(--hover); }
+.yearbook-page .icon-button:active, .yearbook-page .pill-button:active { transform: scale(.94); }
+.yearbook-page .icon-button svg, .yearbook-page .pill-button svg { fill: none; height: 18px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; width: 18px; }
+
+/* stage */
+.yb-back { left: 14px; position: fixed; top: 14px; z-index: 5; }
+.yb-main { display: grid; min-height: 100dvh; padding: 16px 16px 92px; place-items: center; }
+/* Two pages are 1.5x as wide as tall: fit the open book in the height left above the dock. Clip the flip animation. */
+.yb-book-wrap { max-width: min(1400px, calc((100dvh - 124px) * 1.5)); overflow: hidden; width: 100%; }
+.yb-book .page { background: #fff; overflow: hidden; }
+.yb-book .page img { display: block; height: 100%; object-fit: cover; width: 100%; }
+
+/* dock */
+.yb-controls { align-items: center; border-radius: 999px; bottom: max(16px, env(safe-area-inset-bottom)); display: flex; gap: 2px; left: 50%; padding: 5px; position: fixed; transform: translateX(-50%); z-index: 5; }
+.yb-indicator { color: var(--ink-2); font-size: .82rem; font-variant-numeric: tabular-nums; min-width: 9.2em; text-align: center; white-space: nowrap; }
+.yearbook-page .yb-sep { background: color-mix(in srgb, var(--ink) 18%, transparent); height: 22px; margin: 0 6px; width: 1px; }
+
+/* signing pages + signer (structure unchanged; only the chrome goes dark) */
 .yb-book .page-paper { background: #fffdf6; cursor: zoom-in; }
 .sheet-mini { height: 1400px; left: 0; pointer-events: none; position: absolute; top: 0; transform-origin: 0 0; width: 2100px; }
-.signature {
-  color: var(--navy);
-  font-family: "Caveat", cursive;
-  line-height: 1.15;
-  max-width: 600px;
-  overflow-wrap: anywhere;
-  position: absolute;
-  white-space: pre-wrap;
-}
-
-.signer { background: var(--sky); display: flex; flex-direction: column; inset: 0; position: fixed; z-index: 20; }
-.signer[hidden] { display: none; }
-.signer-bar, .signer-tools { align-items: center; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 10px 16px; }
-.signer-bar { justify-content: space-between; }
-.signer-hint { color: var(--navy-deep); font-size: .9rem; margin: 0; text-align: center; }
-.signer-tools[hidden] { display: none; }
-.signer-tools .button { min-width: 52px; padding: 0 16px; }
+.signature { color: var(--navy); font-family: "Caveat", cursive; line-height: 1.15; max-width: 600px; overflow-wrap: anywhere; position: absolute; white-space: pre-wrap; }
+.signer { background: var(--base) var(--stage); display: flex; flex-direction: column; inset: 0; position: fixed; z-index: 20; }
+.signer-bar { align-items: center; display: flex; gap: 8px; justify-content: space-between; padding: 12px 14px; }
+.yearbook-page .signer-bar .glass { border-radius: 999px; }
+.signer-hint { color: var(--ink-2); font-size: .85rem; margin: 0; text-align: center; }
+.signer-tools { border-radius: 999px; bottom: max(16px, env(safe-area-inset-bottom)); display: flex; gap: 2px; left: 50%; padding: 5px; position: absolute; transform: translateX(-50%); }
+.yearbook-page .yearbook-page .pill-solid, .yearbook-page .pill-solid:hover { background: var(--solid); color: var(--solid-ink); }
 .signer-viewport { cursor: crosshair; flex: 1; min-height: 0; overflow: hidden; position: relative; touch-action: none; }
-.sheet {
-  background: #fffdf6 linear-gradient(90deg, transparent 1046px, rgb(0 0 0 / 6%) 1050px, transparent 1054px);
-  box-shadow: var(--shadow);
-  height: 1400px;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 2100px;
-}
-.write-box {
-  background: rgb(255 255 255 / 70%);
-  border: 2px dashed var(--royal);
-  border-radius: 6px;
-  color: var(--navy);
-  font-family: "Caveat", cursive;
-  line-height: 1.15;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  resize: none;
-  width: 600px;
-}
+.sheet { background: #fffdf6 linear-gradient(90deg, transparent 1046px, rgb(0 0 0 / 6%) 1050px, transparent 1054px); box-shadow: var(--sheet-shadow); height: 1400px; left: 0; position: absolute; top: 0; width: 2100px; }
+.write-box { background: rgb(255 255 255 / 70%); border: 2px dashed var(--royal); border-radius: 6px; color: var(--navy); font-family: "Caveat", cursive; line-height: 1.15; overflow: hidden; padding: 0; position: absolute; resize: none; width: 600px; }
 .write-box:focus { outline: none; }
-.signer-status { background: var(--navy-deep); border-radius: 8px; bottom: 76px; color: var(--white); font-size: .9rem; left: 50%; margin: 0; padding: 8px 14px; position: absolute; transform: translateX(-50%); }
-.signer-status[hidden] { display: none; }
-@media (max-width: 560px) {
-  .signer-hint { order: 3; width: 100%; }
-}
+.signer-status { border-radius: 999px; bottom: 76px; font-size: .88rem; left: 50%; margin: 0; padding: 8px 16px; position: absolute; transform: translateX(-50%); white-space: nowrap; }
+@media (max-width: 560px) { .signer-hint { display: none; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
 /* ===== Main page redesign: everything below is scoped to body.home ===== */
 
