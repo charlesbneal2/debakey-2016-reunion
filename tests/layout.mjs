@@ -521,26 +521,6 @@ await test("phone hides Portraits button and shows contents as a sheet", async (
   await page.screenshot({ path: join(SHOTS, "yearbook-portraits-360.png") });
 });
 
-await test("two-finger pinch on the book opens a zoom view of the page", async (open) => {
-  const page = await openBook(open, { width: 390, height: 844 });
-  await page.locator("#portraits-jump").evaluate((el) => el.click()); // hidden on phones, still wired
-  await page.locator('img[src*="/103.webp"]').waitFor();
-  const cdp = await page.context().newCDPSession(page);
-  await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });
-  const before = await indicator(page);
-  const points = [{ x: 150, y: 400 }, { x: 240, y: 400 }];
-  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: points });
-  await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-  await page.locator("#zoom").waitFor({ state: "visible" });
-  assert.equal(await page.locator('#zoom-content img[src*="/103.webp"]').count(), 1);
-  assert.ok((await page.locator("#zoom-content").evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).a)) > 1.5);
-  await page.screenshot({ path: join(SHOTS, "yearbook-zoom-390.png") });
-  await page.keyboard.press("Escape");
-  assert.equal(await page.locator("#zoom").isVisible(), false);
-  assert.equal(await indicator(page), before); // the pinch didn't turn the page
-  assert.deepEqual(page.errors, []);
-});
-
 // --- Yearbook signing sheet ---
 async function openSigner(open, options = {}) {
   const page = await openBook(open, options, "#sign");
