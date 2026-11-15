@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Geist:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body class="yearbook-page">
   <header class="yb-header">
@@ -54,7 +54,12 @@
     <nav aria-label="Chapters"><ul id="chapters" class="yb-chapters"></ul></nav>
   </div>
 
-  <div id="signer" class="signer" role="dialog" aria-modal="true" aria-label="Sign the yearbook" hidden>
+  <div id="zoom" class="zoom" role="dialog" aria-modal="true" aria-label="Zoomed page" hidden>
+    <button id="zoom-close" class="pill-button glass zoom-close" type="button"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Book</button>
+    <div id="zoom-viewport" class="zoom-viewport"><div id="zoom-content" class="zoom-content"></div></div>
+  </div>
+
+  <div id="signer"class="signer" role="dialog" aria-modal="true" aria-label="Sign the yearbook" hidden>
     <div class="signer-bar">
       <button id="signer-close" class="pill-button glass" type="button"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Book</button>
       <p class="signer-hint">Tap anywhere to write. Pinch or scroll to zoom.</p>
@@ -71,6 +76,6 @@
   <script src="config.js"></script>
   <script src="vendor/page-flip.browser.js"></script>
   <script src="vendor/panzoom.min.js"></script>
-  <script src="yearbook.js?v=6"></script>
+  <script src="yearbook.js?v=7"></script>
 </body>
 </html>

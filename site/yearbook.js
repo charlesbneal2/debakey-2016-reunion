@@ -333,7 +333,53 @@
     }
   });
 
+  // ---- Pinch zoom: StPageFlip treats every touch as a page drag (and blocks the browser's own pinch),
+  // so a two-finger touch on the book opens the visible page(s) in a separate zoomable view instead.
+  const zoom = document.getElementById("zoom");
+  const zoomViewport = document.getElementById("zoom-viewport");
+  const zoomContent = document.getElementById("zoom-content");
+  const zoomClose = document.getElementById("zoom-close");
+  const zoomPan = Panzoom(zoomContent, { canvas: true, minScale: 1, maxScale: 4, contain: "outside" });
+  zoomViewport.addEventListener("wheel", zoomPan.zoomWithWheel);
+
+  function openZoom(x, y) {
+    const index = flip.getCurrentPageIndex();
+    const spread = flip.getOrientation() === "landscape" && index % 2 === 1;
+    zoomContent.replaceChildren(...(spread ? [index, index + 1] : [index]).map((i) => pages[i].querySelector("img").cloneNode()));
+    returnFocus = document.activeElement;
+    zoom.hidden = false;
+    behind.forEach((el) => (el.inert = true));
+    document.body.style.overflow = "hidden";
+    zoomPan.reset({ animate: false });
+    zoomPan.zoomToPoint(2, { clientX: x, clientY: y }, { animate: false }); // the pinch already asked for zoom
+    zoomClose.focus({ preventScroll: true });
+  }
+
+  function closeZoom() {
+    zoom.hidden = true;
+    behind.forEach((el) => (el.inert = false));
+    document.body.style.overflow = "";
+    (returnFocus?.matches?.("button, a") ? returnFocus : document.getElementById("next")).focus();
+  }
+
+  // Capture on window runs before StPageFlip's own touchstart listener, so the book never sees the pinch.
+  window.addEventListener("touchstart", (event) => {
+    if (event.touches.length < 2 || !zoom.hidden || !signer.hidden || !book.contains(event.target)) return;
+    const index = flip.getCurrentPageIndex();
+    if (index >= SIGN && index < LAST) return; // signing pages have their own zoomable sheet
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const [a, b] = event.touches;
+    openZoom((a.clientX + b.clientX) / 2, (a.clientY + b.clientY) / 2);
+  }, { capture: true, passive: false });
+  zoomClose.addEventListener("click", closeZoom);
+
   document.addEventListener("keydown", (event) => {
+    if (!zoom.hidden) {
+      if (event.key === "Escape") closeZoom();
+      if (event.key === "Tab") event.preventDefault(); // Close is the only control
+      return;
+    }
     if (!signer.hidden) {
       if (event.key === "Escape") box ? stopWriting() : closeSigner();
       if (event.key === "Tab") {
