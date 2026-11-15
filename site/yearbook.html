@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Geist:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body class="yearbook-page">
   <header class="yb-header">
@@ -21,7 +21,7 @@
     <div class="yb-book-wrap">
       <div id="book" class="yb-book">
         <div class="page page-cover" data-density="hard"><img src="yearbook/pages/front.webp" alt="Yearbook front cover: From Every Angle"></div>
-        <!-- yearbook.js inserts the 118 interior pages here -->
+        <!-- yearbook.js inserts the 122 interior pages here -->
         <div class="page page-paper page-sign" id="sign-left" title="Open to sign the yearbook"><div class="sheet-mini"></div></div>
         <div class="page page-paper page-sign" id="sign-right" title="Open to sign the yearbook"><div class="sheet-mini"></div></div>
         <div class="page page-cover" data-density="hard"><img src="yearbook/pages/back.webp" alt="Yearbook back cover"></div>
@@ -48,7 +48,7 @@
     </div>
     <form id="goto" class="yb-goto">
       <label for="goto-page">Go to page</label>
-      <input id="goto-page" name="page" type="number" inputmode="numeric" min="1" max="118" placeholder="1–118" required>
+      <input id="goto-page" name="page" type="number" inputmode="numeric" min="3" max="119" placeholder="3–119" required>
       <button class="pill-button" type="submit">Go</button>
     </form>
     <nav aria-label="Chapters"><ul id="chapters" class="yb-chapters"></ul></nav>
@@ -71,6 +71,6 @@
   <script src="config.js"></script>
   <script src="vendor/page-flip.browser.js"></script>
   <script src="vendor/panzoom.min.js"></script>
-  <script src="yearbook.js?v=3"></script>
+  <script src="yearbook.js?v=6"></script>
 </body>
 </html>

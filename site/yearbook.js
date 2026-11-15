@@ -1,5 +1,5 @@
 (() => {
-  const PAGES = 118;
+  const PAGES = 122;
   const SIGN = PAGES + 1; // index of the left signing page; front cover is 0
   const LAST = PAGES + 3; // back cover
   const SIGNATURES_URL = `${window.FUNCTIONS_URL}/signatures`;
@@ -9,20 +9,27 @@
   const chapterLabel = document.querySelector("#page-indicator .yb-chapter");
   const pagesLabel = document.querySelector("#page-indicator .yb-pages");
   const contents = document.getElementById("contents");
-  const PORTRAITS = 99;
-  // Where each chapter starts, in file page numbers (what the viewer shows), not the printed ones.
+  // Page numbers shown to people are the ones printed in the book. File n (= flip index n) is printed
+  // page n - 1; files 1-3 and 121-122 are endsheets with no printed number.
+  const FIRST_PRINTED = 3;
+  const LAST_PRINTED = 119;
+  const printed = (index) => (index - 1 >= FIRST_PRINTED && index - 1 <= LAST_PRINTED ? index - 1 : null);
+  const fileOf = (page) => page + 1;
+  const PORTRAITS = 102;
+  // Chapter starts as printed page numbers. menu: false = names the page label only, no menu row.
   const CHAPTERS = [
-    ["Student life", 4], ["Sports", 21], ["Clubs & organizations", 31], ["Academics", 46], ["People", 59],
-    ["Senior superlatives", 97], ["Senior portraits", PORTRAITS], ["Closing", 108], ["Index", 113],
-  ].map(([name, page]) => ({ name, page }));
+    ["Student life", 4], ["Sports", 24], ["Clubs", 34], ["Academics", 50], ["People", 62],
+    ["Senior portraits", PORTRAITS], ["Closing", 111, false], ["Senior superlatives", 114], ["Index", 116, false],
+  ].map(([name, page, menu = true]) => ({ name, page, menu }));
 
   // Interior pages: odd = left half of a spread, even = right half.
   for (let n = 1; n <= PAGES; n++) {
     const page = document.createElement("div");
     page.className = "page";
     const img = document.createElement("img");
-    img.dataset.src = `yearbook/pages/${String(n).padStart(3, "0")}.webp`;
-    img.alt = `Yearbook page ${n}`;
+    // ?v: bump when page images change, or browsers keep showing the old image under a reused name.
+    img.dataset.src = `yearbook/pages/${String(n).padStart(3, "0")}.webp?v=2`;
+    img.alt = printed(n) ? `Yearbook page ${printed(n)}` : "Yearbook endsheet";
     page.append(img);
     book.insertBefore(page, signPages[0]);
   }
@@ -66,27 +73,28 @@
     const index = flip.getCurrentPageIndex();
     const spread = flip.getOrientation() === "landscape" && index % 2 === 1;
     const interior = index > 0 && index < SIGN;
+    const numbers = (spread ? [index, index + 1] : [index]).map(printed).filter(Boolean);
     // Rightmost page in view, so a chapter that starts on a right-hand page is named as soon as it shows.
-    const chapter = interior ? CHAPTERS.findLast((c) => c.page <= index + (spread ? 1 : 0)) : undefined;
+    const chapter = interior && numbers.length ? CHAPTERS.findLast((c) => c.page <= numbers.at(-1)) : undefined;
     chapterLabel.textContent = chapter ? `${chapter.name} · ` : "";
     pagesLabel.textContent =
       index === 0 ? "Cover" : index === LAST ? "Back cover" : !interior ? "Signatures"
-      : spread ? `pp. ${index}–${index + 1}` : `p. ${index} of ${PAGES}`;
+      : numbers.length === 2 ? `pp. ${numbers[0]}–${numbers[1]}` : numbers.length ? `p. ${numbers[0]}` : "Endsheet";
     for (const c of CHAPTERS) {
-      if (c === chapter) c.button.setAttribute("aria-current", "true");
-      else c.button.removeAttribute("aria-current");
+      if (c === chapter) c.button?.setAttribute("aria-current", "true");
+      else c.button?.removeAttribute("aria-current");
     }
     loadNearby(index);
   }
 
   // Contents menu: chapter rows, built from CHAPTERS.
   const chapterList = document.getElementById("chapters");
-  for (const c of CHAPTERS) {
+  for (const c of CHAPTERS.filter((c) => c.menu)) {
     const li = document.createElement("li");
     c.button = document.createElement("button");
     c.button.type = "button";
-    c.button.innerHTML = `<img src="yearbook/thumbs/${String(c.page).padStart(3, "0")}.jpg" alt="" width="30" height="40" loading="lazy"><span>${c.name.replace("&", "&amp;")}</span><small>p. ${c.page}</small>`;
-    c.button.addEventListener("click", () => go(c.page));
+    c.button.innerHTML = `<img src="yearbook/thumbs/${String(c.page).padStart(3, "0")}.jpg" alt="" width="30" height="40" loading="lazy"><span>${c.name}</span><small>p. ${c.page}</small>`;
+    c.button.addEventListener("click", () => go(fileOf(c.page)));
     li.append(c.button);
     chapterList.append(li);
   }
@@ -100,7 +108,8 @@
 
   document.getElementById("goto").addEventListener("submit", (event) => {
     event.preventDefault(); // min/max/required already checked by the browser
-    go(event.target.elements.page.valueAsNumber);
+    // Printed pages missing from the book scan don't exist now, so every page in range has a file.
+    go(fileOf(event.target.elements.page.valueAsNumber));
     event.target.reset();
   });
 
@@ -109,7 +118,7 @@
 
   document.getElementById("prev").addEventListener("click", () => flip.flipPrev());
   document.getElementById("next").addEventListener("click", () => flip.flipNext());
-  document.getElementById("portraits-jump").addEventListener("click", () => go(PORTRAITS));
+  document.getElementById("portraits-jump").addEventListener("click", () => go(fileOf(PORTRAITS)));
   document.getElementById("sign-jump").addEventListener("click", () => openSigner());
 
   // ---- Signing sheet: one big zoomable sheet, messages pinned where people tapped. ----
@@ -124,6 +133,16 @@
   const postButton = document.getElementById("write-post");
   const status = document.getElementById("signer-status");
   const minis = signPages.map((page) => page.querySelector(".sheet-mini"));
+
+  // "Signatures" heading on the left page, as in the printed book. It's an image (rendered once from
+  // the Watford font) because that font isn't licensed for web embedding.
+  for (const el of [sheet, ...minis]) {
+    const title = document.createElement("img");
+    title.className = "sheet-title";
+    title.src = "assets/signatures-title.png";
+    title.alt = el === sheet ? "Signatures" : "";
+    el.append(title);
+  }
 
   // Default (centre) origin: Panzoom's wheel and pinch zoom only keep the focal point steady with it.
   const panzoom = Panzoom(sheet, { canvas: true, maxScale: 2, step: 0.2 });

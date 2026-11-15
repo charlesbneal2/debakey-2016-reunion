@@ -460,7 +460,7 @@ await test("yearbook opens on front cover and next turns page", async (open) => 
   const before = await indicator(page);
   await page.locator("#next").click();
   await page.waitForFunction((text) => document.querySelector("#page-indicator").textContent !== text, before);
-  assert.equal(await page.locator('img[src$="001.webp"]').isVisible(), true);
+  assert.equal(await page.locator('img[src*="/001.webp"]').isVisible(), true);
 });
 
 await test("arrow keys flip when not typing", async (open) => {
@@ -500,14 +500,14 @@ await test("contents menu and Portraits button jump to pages", async (open) => {
   await page.locator("#contents-toggle").click();
   await contents.getByLabel("Go to page").fill("50");
   await contents.getByRole("button", { name: "Go" }).click();
-  assert.equal(await indicator(page), "Academics · pp. 49–50");
+  assert.equal(await indicator(page), "Academics · pp. 50–51");
   assert.equal(await contents.isVisible(), false);
   await page.locator("#contents-toggle").click();
   await contents.getByRole("button", { name: /^Sports/ }).click();
-  assert.equal(await indicator(page), "Sports · pp. 21–22");
+  assert.equal(await indicator(page), "Sports · pp. 24–25");
   await page.locator("#portraits-jump").click();
-  assert.equal(await indicator(page), "Senior portraits · pp. 99–100");
-  await page.locator('img[src$="099.webp"]').waitFor();
+  assert.equal(await indicator(page), "Senior portraits · pp. 102–103");
+  await page.locator('img[src*="/103.webp"]').waitFor();
   assert.deepEqual(page.errors, []);
 });
 
@@ -516,7 +516,7 @@ await test("phone hides Portraits button and shows contents as a sheet", async (
   assert.equal(await page.locator("#portraits-jump").isVisible(), false);
   await page.locator("#contents-toggle").click();
   await page.getByRole("button", { name: /^Senior portraits/ }).click();
-  assert.equal(await indicator(page), "Senior portraits · p. 99 of 118");
+  assert.equal(await indicator(page), "Senior portraits · p. 102");
   assert.equal(await noOverflow(page), true);
   await page.screenshot({ path: join(SHOTS, "yearbook-portraits-360.png") });
 });
@@ -651,7 +651,7 @@ await test("signer signature text is literal", async (open) => {
   const sig = page.locator("#sheet .signature").first();
   await sig.waitFor({ state: "attached" });
   assert.match(await sig.textContent(), /<b>x<\/b>/);
-  assert.equal(await page.locator("#sheet b, #sheet img, .sheet-mini b, .sheet-mini img").count(), 0);
+  assert.equal(await page.locator("#sheet b, #sheet img:not(.sheet-title), .sheet-mini b, .sheet-mini img:not(.sheet-title)").count(), 0);
 });
 
 await test("long unbroken message wraps at 600 units", async (open) => {

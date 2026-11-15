@@ -1,4 +1,4 @@
-"""Cut the 170 senior portraits out of yearbook page files 099-107 (printed pp. 102-110) and
+"""Cut the 170 senior portraits out of yearbook page files 103-111 (printed pp. 102-110) and
 pack them into two sprite strips for the home-page marquee.
 
 One-time tool. Needs opencv + numpy in a throwaway venv:
@@ -46,12 +46,12 @@ def boxes(img):
 
 def faces(src):
     counts, out = {}, []
-    for p in range(99, 108):
+    for p in range(103, 112):
         img = cv2.imread(f"{src}/{p:03}.webp"); bs = boxes(img); counts[p] = len(bs)
         for (x, y, w, h) in bs:
             i = int(w * .07); s = w - 2 * i  # square on the head; inset shaves photo edge + camera skew
             out.append((p, (x, y, w, h), cv2.resize(img[y + i:y + i + s, x + i:x + i + s], (TILE, TILE), interpolation=cv2.INTER_AREA)))
-    assert all(v == 20 for p, v in counts.items() if p < 107) and counts[107] == 10, f"expected 8x20 + 10 portraits, got {counts}"
+    assert all(v == 20 for p, v in counts.items() if p < 111) and counts[111] == 10, f"expected 8x20 + 10 portraits, got {counts}"
     return out
 
 def strip(tiles):
@@ -69,7 +69,7 @@ def main(src="site/yearbook/pages", out="site/assets", debug=None):
     all_faces = faces(src)
     if debug:
         Path(debug).mkdir(parents=True, exist_ok=True)
-        for p in range(99, 108):
+        for p in range(103, 112):
             img = cv2.imread(f"{src}/{p:03}.webp")
             for n, (pp, (x, y, w, h), _) in enumerate(all_faces, 1):
                 if pp == p: cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 3); cv2.putText(img, str(n), (x + 5, y + 30), 0, 1, (0, 255, 255), 2)

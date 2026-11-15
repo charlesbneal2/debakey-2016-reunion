@@ -351,7 +351,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 /* Two pages are 1.5x as wide as tall: fit the open book in the height left above the dock. Clip the flip animation. */
 .yb-book-wrap { max-width: min(1400px, calc((100dvh - 124px) * 1.5)); overflow: hidden; width: 100%; }
 .yb-book .page { background: #fff; overflow: hidden; }
-.yb-book .page img { display: block; height: 100%; object-fit: cover; width: 100%; }
+.yb-book .page > img { display: block; height: 100%; object-fit: cover; width: 100%; }
 
 /* dock */
 .yb-controls { align-items: center; border-radius: 999px; bottom: max(16px, env(safe-area-inset-bottom)); display: flex; gap: 2px; left: 50%; padding: 5px; position: fixed; transform: translateX(-50%); z-index: 5; }
@@ -394,6 +394,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 /* signing pages + signer (structure unchanged; only the chrome goes dark) */
 .yb-book .page-paper { background: #fffdf6; cursor: zoom-in; }
 .sheet-mini { height: 1400px; left: 0; pointer-events: none; position: absolute; top: 0; transform-origin: 0 0; width: 2100px; }
+.sheet-title { height: 84px; left: 525px; pointer-events: none; position: absolute; top: 60px; transform: translateX(-50%); } /* centred on the left half (1050 units) */
 .signature { color: var(--navy); font-family: "Caveat", cursive; line-height: 1.15; max-width: 600px; overflow-wrap: anywhere; position: absolute; white-space: pre-wrap; }
 .signer { background: var(--base) var(--stage); display: flex; flex-direction: column; inset: 0; position: fixed; z-index: 20; }
 .signer-bar { align-items: center; display: flex; gap: 8px; justify-content: space-between; padding: 12px 14px; }
