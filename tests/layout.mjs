@@ -8,7 +8,7 @@ import { chromium } from "playwright";
 
 const SITE_DIR = new URL("../site/", import.meta.url).pathname;
 const SHOTS = process.env.SCREENSHOT_DIR ?? tmpdir();
-const TYPES = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".png": "image/png", ".svg": "image/svg+xml", ".webp": "image/webp" };
+const TYPES = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".png": "image/png", ".svg": "image/svg+xml", ".webp": "image/webp", ".jpg": "image/jpeg" };
 
 const server = createServer(async (req, res) => {
   const path = new URL(req.url, "http://x").pathname;
@@ -492,6 +492,33 @@ await test("no scrollbars while arrow keys flip interior pages", async (open) =>
   await flip("ArrowRight");
   await flip("ArrowLeft");
   assert.deepEqual(await page.evaluate(() => worst), { w: 0, h: 0 });
+});
+
+await test("contents menu and Portraits button jump to pages", async (open) => {
+  const page = await openBook(open, { width: 1280, height: 800 });
+  const contents = page.locator("#contents");
+  await page.locator("#contents-toggle").click();
+  await contents.getByLabel("Go to page").fill("50");
+  await contents.getByRole("button", { name: "Go" }).click();
+  assert.equal(await indicator(page), "Academics · pp. 49–50");
+  assert.equal(await contents.isVisible(), false);
+  await page.locator("#contents-toggle").click();
+  await contents.getByRole("button", { name: /^Sports/ }).click();
+  assert.equal(await indicator(page), "Sports · pp. 21–22");
+  await page.locator("#portraits-jump").click();
+  assert.equal(await indicator(page), "Senior portraits · pp. 99–100");
+  await page.locator('img[src$="099.webp"]').waitFor();
+  assert.deepEqual(page.errors, []);
+});
+
+await test("phone hides Portraits button and shows contents as a sheet", async (open) => {
+  const page = await openBook(open, { width: 360, height: 640 });
+  assert.equal(await page.locator("#portraits-jump").isVisible(), false);
+  await page.locator("#contents-toggle").click();
+  await page.getByRole("button", { name: /^Senior portraits/ }).click();
+  assert.equal(await indicator(page), "Senior portraits · p. 99 of 118");
+  assert.equal(await noOverflow(page), true);
+  await page.screenshot({ path: join(SHOTS, "yearbook-portraits-360.png") });
 });
 
 // --- Yearbook signing sheet ---

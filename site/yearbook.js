@@ -6,7 +6,15 @@
 
   const book = document.getElementById("book");
   const signPages = [document.getElementById("sign-left"), document.getElementById("sign-right")];
-  const indicator = document.getElementById("page-indicator");
+  const chapterLabel = document.querySelector("#page-indicator .yb-chapter");
+  const pagesLabel = document.querySelector("#page-indicator .yb-pages");
+  const contents = document.getElementById("contents");
+  const PORTRAITS = 99;
+  // Where each chapter starts, in file page numbers (what the viewer shows), not the printed ones.
+  const CHAPTERS = [
+    ["Student life", 4], ["Sports", 21], ["Clubs & organizations", 31], ["Academics", 46], ["People", 59],
+    ["Senior superlatives", 97], ["Senior portraits", PORTRAITS], ["Closing", 108], ["Index", 113],
+  ].map(([name, page]) => ({ name, page }));
 
   // Interior pages: odd = left half of a spread, even = right half.
   for (let n = 1; n <= PAGES; n++) {
@@ -54,25 +62,54 @@
     }
   }
 
-  function label(index) {
-    if (index === 0) return "Cover";
-    if (index === LAST) return "Back cover";
-    if (index >= SIGN) return "Signatures";
-    const spread = flip.getOrientation() === "landscape" && index % 2 === 1;
-    return spread ? `Pages ${index}–${index + 1} of ${PAGES}` : `Page ${index} of ${PAGES}`;
-  }
-
   function update() {
     const index = flip.getCurrentPageIndex();
-    indicator.textContent = label(index);
+    const spread = flip.getOrientation() === "landscape" && index % 2 === 1;
+    const interior = index > 0 && index < SIGN;
+    // Rightmost page in view, so a chapter that starts on a right-hand page is named as soon as it shows.
+    const chapter = interior ? CHAPTERS.findLast((c) => c.page <= index + (spread ? 1 : 0)) : undefined;
+    chapterLabel.textContent = chapter ? `${chapter.name} · ` : "";
+    pagesLabel.textContent =
+      index === 0 ? "Cover" : index === LAST ? "Back cover" : !interior ? "Signatures"
+      : spread ? `pp. ${index}–${index + 1}` : `p. ${index} of ${PAGES}`;
+    for (const c of CHAPTERS) {
+      if (c === chapter) c.button.setAttribute("aria-current", "true");
+      else c.button.removeAttribute("aria-current");
+    }
     loadNearby(index);
   }
+
+  // Contents menu: chapter rows, built from CHAPTERS.
+  const chapterList = document.getElementById("chapters");
+  for (const c of CHAPTERS) {
+    const li = document.createElement("li");
+    c.button = document.createElement("button");
+    c.button.type = "button";
+    c.button.innerHTML = `<img src="yearbook/thumbs/${String(c.page).padStart(3, "0")}.jpg" alt="" width="30" height="40" loading="lazy"><span>${c.name.replace("&", "&amp;")}</span><small>p. ${c.page}</small>`;
+    c.button.addEventListener("click", () => go(c.page));
+    li.append(c.button);
+    chapterList.append(li);
+  }
+
+  // turnToPage snaps to the spread holding the page, so no odd/even fix-up here.
+  function go(page) {
+    contents.hidePopover?.(); // ponytail: Popover API (Safari 17+, 2023); older browsers get no menu but nothing breaks
+    flip.turnToPage(page);
+    update();
+  }
+
+  document.getElementById("goto").addEventListener("submit", (event) => {
+    event.preventDefault(); // min/max/required already checked by the browser
+    go(event.target.elements.page.valueAsNumber);
+    event.target.reset();
+  });
 
   flip.on("flip", update);
   flip.on("changeOrientation", update);
 
   document.getElementById("prev").addEventListener("click", () => flip.flipPrev());
   document.getElementById("next").addEventListener("click", () => flip.flipNext());
+  document.getElementById("portraits-jump").addEventListener("click", () => go(PORTRAITS));
   document.getElementById("sign-jump").addEventListener("click", () => openSigner());
 
   // ---- Signing sheet: one big zoomable sheet, messages pinned where people tapped. ----
@@ -190,6 +227,7 @@
   let returnFocus = null;
 
   function openSigner() {
+    contents.hidePopover?.();
     flip.turnToPage(SIGN);
     update();
     returnFocus = document.activeElement;

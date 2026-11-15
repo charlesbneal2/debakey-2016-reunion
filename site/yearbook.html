@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Geist:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body class="yearbook-page">
   <header class="yb-header">
@@ -30,12 +30,29 @@
 
     <nav class="yb-controls glass" aria-label="Yearbook pages">
       <button id="prev" class="icon-button" type="button" aria-label="Previous page"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
-      <span id="page-indicator" class="yb-indicator" aria-live="polite"></span>
+      <button id="contents-toggle" class="pill-button yb-label" type="button" popovertarget="contents">
+        <span id="page-indicator" class="yb-indicator" aria-live="polite"><span class="yb-chapter"></span><span class="yb-pages"></span></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>
+      </button>
       <button id="next" class="icon-button" type="button" aria-label="Next page"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
       <span class="yb-sep" aria-hidden="true"></span>
+      <button id="portraits-jump" class="pill-button yb-wide-only" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Portraits</button>
       <button id="sign-jump" class="pill-button" type="button"><svg viewBox="0 0 24 24"><path d="M4 20l4-1L19 8l-3-3L5 16l-1 4zM14 7l3 3"/></svg>Sign</button>
     </nav>
   </main>
+
+  <div id="contents" class="yb-contents" popover role="dialog" aria-labelledby="contents-title">
+    <div class="yb-contents-head">
+      <h2 id="contents-title">Contents</h2>
+      <button class="icon-button" type="button" popovertarget="contents" popovertargetaction="hide" aria-label="Close contents"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <form id="goto" class="yb-goto">
+      <label for="goto-page">Go to page</label>
+      <input id="goto-page" name="page" type="number" inputmode="numeric" min="1" max="118" placeholder="1–118" required>
+      <button class="pill-button" type="submit">Go</button>
+    </form>
+    <nav aria-label="Chapters"><ul id="chapters" class="yb-chapters"></ul></nav>
+  </div>
 
   <div id="signer" class="signer" role="dialog" aria-modal="true" aria-label="Sign the yearbook" hidden>
     <div class="signer-bar">
@@ -54,6 +71,6 @@
   <script src="config.js"></script>
   <script src="vendor/page-flip.browser.js"></script>
   <script src="vendor/panzoom.min.js"></script>
-  <script src="yearbook.js?v=2"></script>
+  <script src="yearbook.js?v=3"></script>
 </body>
 </html>
