@@ -10,7 +10,7 @@ text, keep contours with portrait-like size + aspect; fill grid gaps for odd pho
 import sys, cv2, numpy as np
 from pathlib import Path
 
-TILE = 144      # px per face in the sprite (shown at 56-76 css px, so >= 2x)
+TILE = 144      # px per face in the sprite (the thanks band shows it at up to 86 css px, so >= 1.6x)
 GAP = 10        # transparent px between faces, baked into the sprite
 RADIUS = 0      # corner radius baked in as alpha; 0 = square, opaque tiles (the thanks band crops them itself)
 SKIP: set[int] = set()  # 1-based portrait numbers (see debug images) to leave out on request

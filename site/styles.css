@@ -1,10 +1,7 @@
 /* Tokens follow shadcn/ui's neutral theme, with the school navy as primary. */
 :root {
   --navy: #12266b;
-  --navy-deep: #0b1846;
   --royal: #2f49c9;
-  --pale: #c9d4ff;
-  --sky: #a2bffe;
   --background: #fff;
   --surface: #fafafa;
   --foreground: #09090b;
@@ -14,7 +11,6 @@
   --ring: rgb(18 38 107 / 22%);
   --white: #fff;
   --danger: #dc2626;
-  --radius: 10px;
   --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 5%);
   --shadow: 0 1px 3px rgb(0 0 0 / 8%), 0 8px 24px -6px rgb(0 0 0 / 8%);
@@ -43,27 +39,9 @@ img { max-width: 100%; height: auto; }
 
 :focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
 
-/* Buttons */
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  background: var(--navy);
-  box-shadow: var(--shadow-sm);
-  color: var(--white);
-  cursor: pointer;
-  font: 500 .95rem/1 var(--sans);
-  height: 44px;
-  padding: 0 22px;
-  text-decoration: none;
-  transition: background-color .15s, box-shadow .15s;
-}
-.button:hover { background: #1b3389; }
-.button:disabled { cursor: wait; opacity: .6; }
-.button-light { background: var(--white); color: var(--navy); }
-.button-light:hover { background: #eef1fb; }
+/* Buttons: .y16 .button (below) supplies the look; every button on the site is under .y16 */
+.button { align-items: center; cursor: pointer; display: inline-flex; justify-content: center; text-decoration: none; }
+.button:disabled { cursor: wait; }
 
 /* Sections */
 .section { padding: clamp(56px, 9vw, 96px) 16px; }
@@ -107,24 +85,8 @@ img { max-width: 100%; height: auto; }
   margin-top: 28px;
   padding: clamp(20px, 5vw, 28px);
 }
-fieldset { border: 0; display: grid; gap: 8px; margin: 0; padding: 0; }
-legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
-.choice {
-  align-items: center;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  font-size: .95rem;
-  gap: 10px;
-  padding: 12px 14px;
-  transition: border-color .15s, box-shadow .15s;
-}
-.choice:hover { border-color: var(--input); }
-.choice:has(input:checked) { border-color: var(--navy); box-shadow: 0 0 0 3px var(--ring); }
-.choice input, .check input { accent-color: var(--navy); margin: 0; }
+.check input { accent-color: var(--navy); margin: 0; }
 .field { display: grid; font-size: .9rem; font-weight: 500; gap: 8px; }
-.field small { color: var(--muted); font-size: .85rem; font-weight: 400; }
 .field input {
   background: var(--background);
   border: 1px solid var(--input);
@@ -157,42 +119,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 }
 
 /* Questions */
-.questions {
-  border-top: 1px solid var(--border);
-  color: var(--muted);
-  font-size: .92rem;
-  padding: 48px 16px 56px;
-  text-align: center;
-}
-.questions h2 { color: var(--foreground); font-size: 1.15rem; margin-bottom: 12px; }
-.questions p { margin: 4px 0; }
-.questions a { color: var(--foreground); }
-
-/* Thank-you and ticket pages */
-.page-center {
-  align-items: center;
-  background: var(--surface);
-  display: flex;
-  justify-content: center;
-  min-height: 100svh;
-  padding: 16px;
-}
-.panel {
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  max-width: 440px;
-  padding: clamp(24px, 6vw, 36px);
-  text-align: center;
-  width: 100%;
-}
-.panel h1 { font-size: clamp(1.5rem, 6vw, 1.85rem); overflow-wrap: anywhere; }
-.panel p { margin: 12px 0; }
-.panel .button { margin-top: 8px; }
-.seal-small { display: block; height: auto; margin: 0 auto 18px; width: 88px; }
-.event-line { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: .92rem; font-weight: 500; padding: 12px; }
-.qr { border: 1px solid var(--border); border-radius: 10px; display: block; height: auto; margin: 16px auto; max-width: 100%; }
+.questions { border-top: 1px solid var(--border); }
 
 /* Privacy */
 .prose h1 { font-size: clamp(1.8rem, 6vw, 2.2rem); margin-bottom: 18px; }
@@ -213,7 +140,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .matches { display: grid; gap: 8px; list-style: none; margin: 0; padding: 0; }
 .matches li { align-items: center; background: #fff; color: var(--ink); display: flex; gap: 10px; justify-content: space-between; overflow-wrap: anywhere; padding: 12px 14px; }
 .matches span { font: 400 21px/1.1 var(--did); }
-.matches small { font-size: 15px; text-align: right; }
+.matches small { font-size: 16px; text-align: right; }
 .result { align-items: center; display: flex; flex-direction: column; gap: 14px; inset: 0; justify-content: center; overflow-wrap: anywhere; padding: 24px; position: fixed; text-align: center; z-index: 10; }
 .result[data-state="good"] { background: var(--lime); color: var(--ink); --focus: var(--ink); }
 .result[data-state="bad"] { background: var(--refuse); color: #fff; --focus: #fff; }
@@ -224,7 +151,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .button, .choice, .field input { transition: none; }
+  .field input { transition: none; }
 }
 
 /* Yearbook viewer and signer (Direction A): title-page charcoal, one slanted ink bar, mint contents.
@@ -239,7 +166,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 }
 .yearbook-page .icon-button { padding: 0; }
 .yearbook-page .icon-button:hover, .yearbook-page .pill-button:hover { background: rgb(255 255 255 / 12%); }
-.yearbook-page svg { fill: none; flex: none; height: 20px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; width: 20px; }
+.yearbook-page :where(.icon-button, .pill-button, .button) svg { fill: none; flex: none; height: 20px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; width: 20px; }
 
 /* stage: back control top left, rainbow chevrons top right (behind the book, sized to stay clear of it) */
 .yb-back { left: 14px; position: fixed; top: 14px; z-index: 5; }
@@ -290,7 +217,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 }
 .yb-chapters button[aria-current] { box-shadow: inset 6px 0 0 var(--pink); padding-left: 14px; }
 .yb-chapters img { display: none; }
-.yb-chapters small { font-size: 1em; font-variant-numeric: tabular-nums; letter-spacing: .14em; white-space: nowrap; }
+.yb-chapters small { font-size: 1em; font-variant-numeric: tabular-nums; letter-spacing: .04em; white-space: nowrap; }
 .yb-signoff { font: 800 22px/1 var(--exo); margin: 16px 0 0; }
 @media (max-width: 560px) {
   .yearbook-page .yb-wide-only, .yb-chapter { display: none; } /* "Senior superlatives" would push the bar past 360 px */
@@ -310,14 +237,15 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .signer-bar { align-items: center; display: flex; gap: 8px; justify-content: space-between; padding: 12px 14px; }
 .yearbook-page .signer .button { gap: 6px; }
 .yearbook-page .signer .button svg { height: 18px; margin-left: -6px; width: 18px; }
-.signer-hint { color: rgb(255 255 255 / 80%); font-size: 15px; margin: 0; text-align: center; }
+.signer-hint { color: rgb(255 255 255 / 80%); font-size: 16px; margin: 0; text-align: center; }
 .signer-tools { bottom: max(16px, env(safe-area-inset-bottom)); display: flex; gap: 12px; left: 50%; position: absolute; transform: translateX(-50%); }
 /* Cancel/Post float over the cream sheet or the charcoal: ink ring with a white halo reads on both. */
 .yearbook-page .signer-tools :focus-visible { --focus: var(--ink); box-shadow: 0 0 0 6px #fff; }
 .signer-viewport { cursor: crosshair; flex: 1; min-height: 0; overflow: hidden; position: relative; touch-action: none; }
 .sheet { background: #fffdf6 linear-gradient(90deg, transparent 1046px, rgb(0 0 0 / 6%) 1050px, transparent 1054px); box-shadow: 0 30px 80px rgb(0 0 0 / 60%); height: 1400px; left: 0; position: absolute; top: 0; width: 2100px; }
 .write-box { background: rgb(255 255 255 / 70%); border: 2px dashed var(--royal); border-radius: 6px; color: var(--navy); font-family: "Caveat", cursive; line-height: 1.15; overflow: hidden; padding: 0; position: absolute; resize: none; width: 600px; }
-.yearbook-page .write-box:focus { outline: none; } /* beats .y16 :focus-visible; the dashed border marks it */
+.yearbook-page .write-box:focus { outline: none; }
+.yearbook-page .write-box:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; } /* after the rule above, same specificity */
 .signer-status { bottom: 76px; color: #fff; font: 600 15px/1 var(--jos); isolation: isolate; left: 50%; margin: 0; padding: 14px 30px 11px; position: absolute; transform: translateX(-50%); white-space: nowrap; }
 .signer-status::before { background: var(--ink); clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); content: ""; inset: 0; position: absolute; z-index: -1; }
 @media (max-width: 560px) { .signer-hint { display: none; } }
@@ -325,6 +253,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 @media (forced-colors: active) {
   .yb-controls, .yb-contents, .signer-status { outline: 2px solid CanvasText; }
   .yearbook-page .icon-button, .yearbook-page .pill-button { border: 1px solid ButtonText; }
+  .yearbook-page .yb-label svg { color: ButtonText; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
@@ -495,7 +424,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .home .chip input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 3px; }
 .home .field small { color: inherit; font: inherit; letter-spacing: 0; text-transform: none; } /* base grey was 3.7:1 on peach */
 .home .ticket-form .button { width: 100%; }
-.home .fine { color: var(--ink-2); font-size: 14px; text-align: center; }
+.home .fine { color: var(--ink-2); font-size: 16px; text-align: center; }
 .home .form-status { color: var(--refuse); font-size: 15px; font-weight: 600; margin: 0; }
 .home .form-status:empty { display: none; }
 .home .sales-closed { background: none; border: 0; border-radius: 0; border-top: 1.5px solid var(--ink); box-shadow: none; font: 400 24px/1.2 var(--did); grid-column: 1; margin-top: 8px; max-width: 30ch; padding: 14px 0 0; text-align: left; }
@@ -525,7 +454,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
   .home .tickets .copy { font-size: 17px; }
   .home .ticket-form { margin: 0 -6px; padding: 22px 18px 20px; }
   .home .ticket-form fieldset { grid-template-columns: 1fr; }
-  .home .questions { font-size: 15px; padding: 26px 16px 30px; }
+  .home .questions { padding: 26px 16px 30px; }
 }
 
 /* ================= .y16: yearbook reskin shared system =================
@@ -576,7 +505,6 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
   position: absolute;
   z-index: -1;
 }
-.y16 .button:hover, .y16 .button-light:hover { background: transparent; }
 .y16 .button:hover::before { filter: brightness(1.25); }
 .y16 .button-alt { --fill: var(--green); color: var(--ink); }
 .y16 .button-alt:hover::before { filter: brightness(1.1); }
@@ -662,8 +590,8 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 @media (prefers-reduced-motion: reduce) { .thanks .ptrack { animation: none; } }
 .thanks .lead { bottom: 44px; display: grid; gap: 11px; justify-items: start; left: 20px; position: absolute; right: 20px; z-index: 2; }
 .thanks .big { font: 400 21px/1.25 var(--did); }
-.thanks .event { font-size: 15px; }
-.thanks .contact { font-size: 15px; }
+.thanks .event { font-size: 16px; }
+.thanks .contact { font-size: 16px; }
 .thanks .contact a { color: inherit; text-underline-offset: 3px; }
 @media (min-width: 601px) {
   .thanks { --u: min(1px, 100vw / 1140); }
@@ -689,7 +617,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .ticket .copy { font: 600 19px var(--jos); margin: 0; }
 .ticket .copy:empty { display: none; }
 .ticket .event { font-size: 17px; margin: 0; }
-.ticket .contact { font-size: 15px; margin: 0; }
+.ticket .contact { font-size: 16px; margin: 0; }
 .ticket .contact a { color: inherit; text-underline-offset: 3px; }
 @media (max-width: 600px) {
   .ticket .portrait h1 { font-size: 32px; }
