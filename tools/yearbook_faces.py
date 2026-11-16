@@ -1,5 +1,5 @@
 """Cut the 170 senior portraits out of yearbook page files 103-111 (printed pp. 102-110) and
-pack them into two sprite strips for the home-page marquee.
+pack them into two sprite strips (square corners) that feed the thanks-page portrait band.
 
 One-time tool. Needs opencv + numpy in a throwaway venv:
     python3 -m venv venv && venv/bin/pip install opencv-python-headless numpy
@@ -12,7 +12,7 @@ from pathlib import Path
 
 TILE = 144      # px per face in the sprite (shown at 56-76 css px, so >= 2x)
 GAP = 10        # transparent px between faces, baked into the sprite
-RADIUS = 34     # rounded-corner radius, baked in as alpha
+RADIUS = 0      # corner radius baked in as alpha; 0 = square, opaque tiles (the thanks band crops them itself)
 SKIP: set[int] = set()  # 1-based portrait numbers (see debug images) to leave out on request
 
 def boxes(img):
@@ -55,10 +55,12 @@ def faces(src):
     return out
 
 def strip(tiles):
-    alpha = np.zeros((TILE, TILE), np.uint8)
-    cv2.rectangle(alpha, (RADIUS, 0), (TILE - RADIUS - 1, TILE - 1), 255, -1); cv2.rectangle(alpha, (0, RADIUS), (TILE - 1, TILE - RADIUS - 1), 255, -1)
-    for c in ((RADIUS, RADIUS), (TILE - RADIUS - 1, RADIUS), (RADIUS, TILE - RADIUS - 1), (TILE - RADIUS - 1, TILE - RADIUS - 1)):
-        cv2.circle(alpha, c, RADIUS, 255, -1, cv2.LINE_AA)
+    alpha = np.full((TILE, TILE), 255, np.uint8)
+    if RADIUS:
+        alpha[:] = 0
+        cv2.rectangle(alpha, (RADIUS, 0), (TILE - RADIUS - 1, TILE - 1), 255, -1); cv2.rectangle(alpha, (0, RADIUS), (TILE - 1, TILE - RADIUS - 1), 255, -1)
+        for c in ((RADIUS, RADIUS), (TILE - RADIUS - 1, RADIUS), (RADIUS, TILE - RADIUS - 1), (TILE - RADIUS - 1, TILE - RADIUS - 1)):
+            cv2.circle(alpha, c, RADIUS, 255, -1, cv2.LINE_AA)
     out = np.zeros((TILE, len(tiles) * (TILE + GAP), 4), np.uint8)
     for n, t in enumerate(tiles):
         x = n * (TILE + GAP) + GAP // 2
