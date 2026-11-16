@@ -43,58 +43,6 @@ img { max-width: 100%; height: auto; }
 
 :focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
 
-/* Cover */
-.cover {
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgb(255 255 255 / 40%), transparent 70%),
-    var(--sky);
-  color: var(--navy-deep);
-}
-
-.cover-inner {
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(10px, 2svh, 20px);
-  margin: 0 auto;
-  max-width: 720px;
-  padding: 32px 16px;
-  text-align: center;
-}
-
-.cover p { margin: 0; }
-
-.kicker {
-  border: 1px solid rgb(11 24 70 / 15%);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 35%);
-  color: var(--navy);
-  font-size: .78rem;
-  font-weight: 500;
-  padding: 4px 12px;
-}
-
-.seal {
-  width: clamp(96px, 24svh, 200px);
-  height: auto;
-}
-
-.cover h1 { font-size: clamp(2.1rem, min(9vw, 7svh), 4rem); letter-spacing: -.04em; }
-.school { color: var(--navy); font-size: clamp(.9rem, 2.4vw, 1.05rem); }
-.facts {
-  display: grid;
-  gap: 2px;
-  color: rgb(11 24 70 / 88%);
-  font-size: clamp(.9rem, 2.4vw, 1rem);
-}
-.facts br { display: none; }
-.closed-note { font-weight: 600; }
-.cover-contact { color: rgb(11 24 70 / 75%); font-size: .82rem; }
-.cover-contact a { color: var(--navy-deep); white-space: nowrap; }
-.cover .button { margin-top: 6px; }
-
 /* Buttons */
 .button {
   display: inline-flex;
@@ -412,169 +360,81 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 @media (max-width: 560px) { .signer-hint { display: none; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
-/* ===== Main page redesign: everything below is scoped to body.home ===== */
+/* ===== Home page: scoped to body.home (with .y16 for tokens and fonts) ===== */
 
-/* ---------- tokens: "midnight" ---------- */
-body.home {
-  --bg: #050a1c;
-  --bg-glow-1: rgb(47 73 201 / 55%);
-  --bg-glow-2: rgb(162 191 254 / 28%);
-  --ink: #f5f7ff;
-  --ink-2: rgb(245 247 255 / 70%);
-  --ink-3: rgb(245 247 255 / 48%);
-  --accent: #a2bffe;
-  --glass-a: rgb(255 255 255 / 15%);
-  --glass-b: rgb(255 255 255 / 4%);
-  --glass-edge: rgb(255 255 255 / 22%);
-  --glass-hi: rgb(255 255 255 / 45%);
-  --glass-shadow: rgb(0 3 18 / 55%);
-  --glass-solid: #17224d;            /* fallback when backdrop-filter is unsupported */
-  --field: rgb(255 255 255 / 7%);
-  --field-edge: rgb(255 255 255 / 20%);
-  --cta: #f5f7ff;
-  --cta-ink: #0b1846;
-  --seal-filter: brightness(0) invert(1);
-  --danger-ink: #ff9a9a;
-  --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
-  --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --ease: cubic-bezier(.2, .8, .2, 1);
-  color-scheme: dark;
-}
-/* ---------- "daylight": same layout, light sky palette ---------- */
-:root[data-theme="daylight"] body.home {
-  --bg: #e9efff;
-  --bg-glow-1: rgb(162 191 254 / 95%);
-  --bg-glow-2: rgb(255 255 255 / 90%);
-  --ink: #0b1846;
-  --ink-2: rgb(11 24 70 / 72%);
-  --ink-3: rgb(11 24 70 / 50%);
-  --accent: #2f49c9;
-  --glass-a: rgb(255 255 255 / 72%);
-  --glass-b: rgb(255 255 255 / 34%);
-  --glass-edge: rgb(255 255 255 / 85%);
-  --glass-hi: rgb(255 255 255 / 95%);
-  --glass-shadow: rgb(18 38 107 / 22%);
-  --glass-solid: #f6f8ff;
-  --field: rgb(255 255 255 / 60%);
-  --field-edge: rgb(11 24 70 / 16%);
-  --cta: #12266b;
-  --cta-ink: #fff;
-  --seal-filter: none;
-  --danger-ink: #b91c1c;
-  color-scheme: light;
-}
-
-.home, .home * { box-sizing: border-box; }
-html:has(body.home) { scroll-behavior: smooth; }
-body.home {
-  margin: 0;
-  background: var(--bg);
+/* ---------- cover: Direction B hero ----------
+   Back to front: photo (white wash baked in), mint diagonal (.lock::before), chevrons, lockup, facts.
+   Content sits in flow at the bottom; the top padding keeps the chevron grid clear of the lockup. */
+.home .cover {
+  --cw: min(21vw, 12svh);                      /* chevron width; everything in the grid scales from it */
+  align-items: flex-start;
+  background: #fff url(assets/cover/bg.webp) center / cover;
   color: var(--ink);
-  font: 400 16px/1.6 var(--sans);
-  -webkit-font-smoothing: antialiased;
-}
-/* Soft colour field behind everything: gives the glass something to refract. Gradients only, no blur filter. */
-body.home { position: relative; }
-body.home::before {
-  content: "";
-  position: absolute;                /* scrolls with the page: no fixed-background repaints on phones */
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(70vmax 50vmax at 88% 0, var(--bg-glow-1), transparent 65%),
-    radial-gradient(55vmax 45vmax at 0 22%, var(--bg-glow-2), transparent 60%),
-    radial-gradient(60vmax 50vmax at 50% 52%, var(--bg-glow-1), transparent 62%),
-    radial-gradient(60vmax 50vmax at 15% 92%, var(--bg-glow-2), transparent 60%),
-    radial-gradient(60vmax 50vmax at 95% 100%, var(--bg-glow-1), transparent 65%);
-}
-.home h1, .home h2 { font-family: var(--serif); font-weight: 400; letter-spacing: -.01em; line-height: 1.05; margin: 0; }
-.home a { color: inherit; text-underline-offset: 3px; }
-.home img { max-width: 100%; height: auto; }
-.home [hidden] { display: none !important; }
-.home :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-
-/* ---------- liquid glass ---------- */
-.home .glass {
-  position: relative;
-  background: linear-gradient(135deg, var(--glass-a), var(--glass-b));
-  border: 1px solid var(--glass-edge);
-  box-shadow:
-    inset 0 1px 0 var(--glass-hi),             /* top specular edge */
-    inset 0 -1px 0 rgb(255 255 255 / 6%),      /* faint bottom rim */
-    0 18px 40px -18px var(--glass-shadow);
-  -webkit-backdrop-filter: blur(18px) saturate(170%);
-  backdrop-filter: blur(18px) saturate(170%);
-}
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .home .glass { background: var(--glass-solid); }
-}
-
-/* ---------- faces marquee ---------- */
-.home .faces {
-  --tile: clamp(52px, 6.2vw, 76px);
-  display: grid;
-  gap: 8px;
-  overflow: hidden;
-  padding: 14px 0 0;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-}
-.home .faces-track { display: flex; width: max-content; animation: faces 240s linear infinite; }
-.home .faces-track:nth-child(2) { animation-direction: reverse; animation-duration: 280s; }
-.home .faces-track img { display: block; height: var(--tile); width: auto; max-width: none; }
-.home .faces:hover .faces-track { animation-play-state: paused; }
-@keyframes faces { to { transform: translateX(-50%); } }
-@media (prefers-reduced-motion: reduce) {
-  html:has(body.home) { scroll-behavior: auto; }
-  .home .faces { overflow-x: auto; scrollbar-width: none; }
-  .home .faces-track { animation: none; }
-  .home, .home * { transition: none !important; }
-}
-@media (max-height: 700px) and (max-width: 560px) { .home .faces-track:nth-child(2) { display: none; } }
-
-/* ---------- cover ---------- */
-.home .cover { display: flex; flex-direction: column; min-height: 100svh; text-align: center; }
-.home .cover-inner {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(10px, 2.2svh, 22px);
-  margin: 0 auto;
-  max-width: 760px;
-  padding: 20px 16px 36px;
+  gap: 16px;
+  isolation: isolate;
+  justify-content: flex-end;
+  min-height: 100svh;
+  overflow: hidden;
+  padding: calc(var(--cw) * 3.6) 14px 12px;
+  position: relative;
 }
-.home .cover p { margin: 0; }
-.home .kicker { border-radius: 999px; color: var(--ink-2); font-size: .74rem; font-weight: 500; letter-spacing: .14em; padding: 6px 14px; text-transform: uppercase; }
-.home .seal { width: clamp(64px, 13svh, 120px); height: auto; filter: var(--seal-filter); opacity: .92; }
-.home .cover h1 { font-size: clamp(2.7rem, min(11vw, 10svh), 5.6rem); }
-.home .cover h1 em { color: var(--accent); }
-.home .school { color: var(--ink-2); font-size: clamp(.9rem, 2.4vw, 1.05rem); }
-.home .facts { border-radius: 22px; display: grid; grid-template-columns: 1fr 1fr; font-size: .95rem; margin-top: 6px; overflow: hidden; text-align: left; width: min(100%, 560px); }
-.home .facts > div { padding: 14px 20px; }
-.home .facts > div + div { border-left: 1px solid var(--glass-edge); }
-.home .facts small { color: var(--ink-3); display: block; font-size: .7rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; }
-.home .facts b { font-weight: 500; }
-.home .facts span { color: var(--ink-2); display: block; font-size: .85rem; }
-.home .cover-contact { color: var(--ink-3); font-size: .8rem; }
-.home .cover-contact a { color: var(--ink-2); white-space: nowrap; }
+.home .chev { align-items: flex-start; display: flex; gap: calc(var(--cw) * .066); position: absolute; right: calc(var(--cw) * -.08); top: calc(var(--cw) * -.26); }
+.home .chev div { display: grid; width: var(--cw); }
+.home .chev div:nth-child(even) { margin-top: calc(var(--cw) * -.47); }
+.home .chev div > * {
+  clip-path: polygon(0 0, 50% 36%, 100% 0, 100% 64%, 50% 100%, 0 64%);
+  display: block;
+  height: calc(var(--cw) * .95);
+  margin-top: calc(var(--cw) * -.28);
+  object-fit: cover;
+  width: 100%;
+}
+.home .chev div > :first-child { margin-top: 0; }
+.home .chev .white { background: rgb(255 255 255 / 55%); }
+.home .chev .ink { background: var(--ink); }
+.home .chev .cyan { background: var(--cyan); }
+.home .chev .magenta { background: var(--magenta); }
+.home .chev .lime { background: var(--lime); }
+.home .chev .yellow { background: var(--yellow); }
+.home .chev .orange { background: var(--orange); }
 
-/* ---------- buttons ---------- */
-.home .button {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  border: 0; border-radius: 999px;
-  background: var(--cta); color: var(--cta-ink);
-  cursor: pointer;
-  font: 500 .95rem/1 var(--sans);
-  height: 48px; padding: 0 26px;
-  text-decoration: none;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), 0 10px 30px -10px var(--glass-shadow);
-  transition: transform .25s var(--ease), box-shadow .25s var(--ease);
+/* Lockup. Its ::before is the mint diagonal: the mint edge runs through a point 26px right of the
+   lockup's top-right corner, so the whole lockup is on mint at any aspect ratio. Two white hairlines sit outside it. */
+.home .lock { margin-left: 4px; position: relative; }
+.home .lock::before {
+  background: linear-gradient(#fff 0 2px, transparent 2px 20px, #fff 20px 24px, var(--mint2) 24px);
+  content: "";
+  height: 200vmax;
+  left: calc(100% + 26px - 150vmax);
+  position: absolute;
+  top: -24px;
+  transform: rotate(32deg);
+  transform-origin: 50% 24px;
+  width: 300vmax;
+  z-index: -1;
 }
-.home .button:hover { transform: translateY(-1px) scale(1.015); }
-.home .button:active { transform: scale(.98); }
-.home .button-glass { background: linear-gradient(135deg, var(--glass-a), var(--glass-b)); color: var(--ink); height: 40px; padding: 0 20px; font-size: .88rem; }
+.home .cad { color: var(--ink-2); font: 400 13px/1 var(--jos); letter-spacing: .42em; margin-bottom: 4px; text-transform: uppercase; }
+.home .lock h1 { color: var(--rust); font: 300 34px/.9 var(--jos); letter-spacing: -.02em; text-transform: uppercase; }
+.home .lock h1 b { color: var(--ink); display: block; font: italic 900 62px/.8 var(--exo); letter-spacing: -.04em; margin-top: 6px; padding-right: .1em; }
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .home .lock h1 b {
+    background: linear-gradient(176deg, var(--ink) 0 47%, transparent 47% 50%, var(--ink) 50%, var(--ink-2) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+@media (forced-colors: active) { .home .lock h1 b { background: none; color: CanvasText; } }
+
+.home .cover p { margin: 0; }
+.home .facts { background: #fff; border-left: 6px solid var(--magenta); display: grid; font-size: 16px; gap: 7px; justify-items: start; max-width: 400px; padding: 12px 16px; width: 100%; }
+.home .facts p b { display: block; font: 700 17px/1.2 var(--exo); }
+.home .facts .button { margin-top: 6px; }
+
+.home .seal { height: auto; width: 88px; }
+
 
 /* ---------- sections ---------- */
 .home .section { padding: clamp(44px, 7vw, 80px) 16px; }
@@ -634,19 +494,10 @@ body.home::before {
 .home .questions a { color: var(--ink-2); }
 
 @media (max-width: 560px) {
-  .home .facts { grid-template-columns: 1fr; text-align: center; }
-  .home .facts > div { padding: 10px 16px; }
-  .home .facts > div + div { border-left: 0; border-top: 1px solid var(--glass-edge); }
   .home fieldset { grid-template-columns: 1fr; }
 }
 
 /* ---------- compatibility with shared rules and the ticket flow ---------- */
-.home .cover { background: none; color: inherit; }
-.home .cover-inner { min-height: 0; }
-.home .cover .button { margin-top: 0; }
-.home .button:hover { background: var(--cta); }
-.home .button-glass:hover { background: linear-gradient(135deg, var(--glass-a), var(--glass-b)); }
-.home .facts { gap: 0; color: inherit; font-size: .95rem; }
 .home .closed-note { color: var(--ink); font-weight: 500; }
 .home .yearbook, .home .tickets { background: none; border-top: 0; }
 .home .section > .wrap > .muted { margin: 12px auto 0; }

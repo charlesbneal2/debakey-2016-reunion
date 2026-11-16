@@ -27,7 +27,7 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
 
 // Full Chromium, not the headless shell: the shell skips the page-flip overflow the yearbook tests check for.
 const browser = await chromium.launch({ channel: "chromium" });
-const VIEWPORTS = [[360, 640], [390, 844], [1280, 800]];
+const VIEWPORTS = [[320, 568], [360, 640], [390, 844], [1280, 800]];
 let failures = 0;
 
 const json = (route, body, status = 200) =>
@@ -80,10 +80,49 @@ await test("key facts fit on first screen of a small phone", async (open) => {
   for (const text of ["November 28, 2026", "Eureka Heights", "Get Tickets", "info@debakey2016reunion.com"]) {
     const box = await cover.getByText(text).first().boundingBox();
     assert.ok(box, `${text} is visible`);
-    assert.ok(box.y + box.height <= 640, `${text} bottom ${box.y + box.height} <= 640`);
+    assert.ok(box.y + box.height <= 630, `${text} bottom ${box.y + box.height} <= 630`);
   }
   await page.screenshot({ path: join(SHOTS, "cover-360.png") });
 });
+
+// Pixel colour at one CSS point, read back through a canvas so no PNG decoder is needed.
+async function pixel(page, x, y) {
+  const png = await page.screenshot({ clip: { x, y, width: 1, height: 1 } });
+  return page.evaluate(async (src) => {
+    const img = new Image();
+    img.src = src;
+    await img.decode();
+    const ctx = Object.assign(document.createElement("canvas"), { width: 1, height: 1 }).getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    return [...ctx.getImageData(0, 0, 1, 1).data].slice(0, 3);
+  }, `data:image/png;base64,${png.toString("base64")}`);
+}
+
+for (const [width, height] of [[320, 568], [360, 640], [390, 844]]) {
+  await test(`cover lockup sits on mint, clear of the facts, at ${width}x${height}`, async (open) => {
+    const page = await open({ width, height });
+    await page.goto(BASE);
+    await page.waitForLoadState("load");
+    const chevrons = page.locator("#cover .chev img");
+    assert.equal(await chevrons.count(), 7);
+    assert.equal(await chevrons.evaluateAll((imgs) => imgs.every((img) => img.complete && img.naturalWidth > 0)), true, "chevron photos load");
+    const lock = await page.locator("#cover .lock").boundingBox();
+    const facts = await page.locator("#cover .facts").boundingBox();
+    assert.ok(lock && facts, "lockup and facts panel are visible");
+    const apart = lock.y + lock.height <= facts.y || facts.y + facts.height <= lock.y || lock.x + lock.width <= facts.x || facts.x + facts.width <= lock.x;
+    assert.ok(apart, `lockup ${JSON.stringify(lock)} clear of facts ${JSON.stringify(facts)}`);
+    const chev = await page.locator("#cover .chev").boundingBox();
+    assert.ok(chev.y + chev.height <= lock.y, `chevrons end ${chev.y + chev.height} above lockup ${lock.y}`);
+    await page.addStyleTag({ content: "#cover .lock, #cover .lock * { color: transparent !important; background: none !important; }" });
+    const [l, t, r, b] = [lock.x + 1, lock.y + 1, lock.x + lock.width - 2, lock.y + lock.height - 2].map(Math.round);
+    for (const [x, y] of [[l, t], [r, t], [l, b], [r, b]]) {
+      const rgb = await pixel(page, x, y);
+      const mint = [0xcd, 0xfe, 0xd5];
+      assert.ok(rgb.every((v, i) => Math.abs(v - mint[i]) <= 6), `lockup corner ${x},${y} is mint, got rgb(${rgb})`);
+    }
+    await page.screenshot({ path: join(SHOTS, `cover-${width}x${height}.png`) });
+  });
+}
 
 await test("yearbook section links to the book and signing", async (open) => {
   const page = await open();
@@ -95,7 +134,7 @@ await test("yearbook section links to the book and signing", async (open) => {
   assert.equal(await section.getByRole("link", { name: "The 2016 Yearbook" }).count(), 1); // the book itself links to the viewer
   assert.ok(await section.locator("img").getAttribute("alt"));
   assert.equal(await page.getByText("leave your name and a note").count(), 0);
-  assert.equal(await page.locator(".faces img").count(), 4);
+  assert.equal(await page.locator(".faces img").count(), 0);
 });
 
 // ponytail: guest list is paused (see index.html); restore its old tests from git history when it comes back.
@@ -230,8 +269,8 @@ await test("page has share tags, contact link, and logo alt text", async (open) 
   }
   assert.match(await page.locator('meta[property="og:image"]').getAttribute("content"), /^https:\/\/debakey2016reunion\.com\//);
   assert.ok(await page.locator('a[href="mailto:info@debakey2016reunion.com"]').count());
-  assert.match(await page.locator("#cover img.seal").getAttribute("alt"), /DeBakey/);
-  const loaded = await page.locator("#cover img.seal").evaluate((img) => img.decode().then(() => img.naturalWidth));
+  assert.match(await page.locator("#questions img.seal").getAttribute("alt"), /DeBakey/);
+  const loaded = await page.locator("#questions img.seal").evaluate((img) => img.decode().then(() => img.naturalWidth));
   assert.ok(loaded > 0, "logo image loads");
 });
 
