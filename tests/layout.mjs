@@ -776,6 +776,19 @@ await test("signer takes focus and gives it back", async (open) => {
   assert.equal(await page.evaluate(() => document.activeElement.id), "sign-jump");
 });
 
+await test(".y16 button keeps an unclipped focus outline", async (open) => {
+  const page = await open();
+  await page.route(`${BASE}/y16-sample`, (route) => route.fulfill({ contentType: "text/html",
+    body: '<!doctype html><link rel="stylesheet" href="/styles.css"><body class="y16"><button class="button" type="button">Open</button>' }));
+  await page.goto(`${BASE}/y16-sample`);
+  await page.keyboard.press("Tab");
+  const style = await page.locator(".button").evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { focused: el.matches(":focus-visible"), outline: `${s.outlineStyle} ${s.outlineWidth} ${s.outlineColor}`, offset: s.outlineOffset, clip: s.clipPath };
+  });
+  assert.deepEqual(style, { focused: true, outline: "solid 3px rgb(24, 28, 25)", offset: "3px", clip: "none" });
+});
+
 await browser.close();
 server.close();
 if (failures) {

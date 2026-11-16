@@ -658,3 +658,104 @@ body.home::before {
 .home .eyebrow { color: var(--accent); }
 .home .choice:hover { border-color: var(--accent); }
 .home .field input { box-shadow: none; }
+
+/* ================= .y16: yearbook reskin shared system =================
+   Put class="y16" on <body> and add this font link (4 latin woff2, ~123 KiB):
+   https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Exo+2:ital,wght@0,700;0,800;1,800;1,900&family=Josefin+Sans:wght@300;400;600&display=swap
+   Pieces: .button (+ .button-alt, .button-small, .button-light), .field, .paper, .folio, .wedge, .twist.
+   Surfaces: .charcoal switches the focus ring to lime. */
+.y16 {
+  --mint: #dbf3dc; --mint2: #cdfed5; --paper: #fdfdfb;
+  --ink: #181c19; --ink-2: #2f5a44; --rust: #c8501a;
+  --green: #8ea812; --green-d: #5d7400; --peach: #ffddb5; --blue: #0e71a5;
+  --char: #3a3837; --lime: #abec0d; --refuse: #b3122f;
+  --cyan: #06c1ff; --yellow: #feda08; --orange: #fc8c16; --magenta: #f00379; --pink: #e42648; --teal: #80ead7; /* fills only, never text */
+  --exo: "Exo 2", system-ui, sans-serif;
+  --did: "Abril Fatface", Georgia, serif;
+  --jos: "Josefin Sans", "Century Gothic", system-ui, sans-serif;
+  --focus: var(--ink);
+  background: #fff;
+  color: var(--ink);
+  font: 400 17px/1.5 var(--jos);
+}
+.y16 .charcoal { --focus: var(--lime); background: var(--char); color: #fff; }
+
+/* one focus ring for buttons, links, fields, chips and viewer controls */
+.y16 :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+/* slanted button: the slant is the ::before fill, so the box (and its outline) is never clipped */
+.y16 .button {
+  --fill: var(--ink);
+  background: transparent;
+  border: 2px solid transparent; /* edge in forced-colors mode */
+  border-radius: 0;
+  box-shadow: none;
+  color: #fff;
+  font: italic 800 19px/1 var(--exo);
+  height: auto;
+  isolation: isolate;
+  min-height: 52px;
+  padding: 0 34px;
+  position: relative;
+  transition: none;
+}
+.y16 .button::before {
+  background: var(--fill);
+  clip-path: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+  content: "";
+  inset: 0;
+  position: absolute;
+  z-index: -1;
+}
+.y16 .button:hover, .y16 .button-light:hover { background: transparent; }
+.y16 .button:hover::before { filter: brightness(1.25); }
+.y16 .button-alt { --fill: var(--green); color: var(--ink); }
+.y16 .button-alt:hover::before { filter: brightness(1.1); }
+.y16 .button-light { --fill: #fff; color: var(--ink); }
+.y16 .button-light:hover::before { filter: brightness(.92); }
+.y16 .button-small { font-size: 15px; min-height: 44px; padding: 0 24px; }
+.y16 .button:disabled { --fill: #d3d6d3; color: #4a4f4b; opacity: 1; }
+.y16 .button:disabled::before { filter: none; }
+
+/* field: uppercase label over an ink-bordered input with a heavy bottom edge */
+.y16 .field { font: 600 14px/1 var(--jos); gap: 8px; letter-spacing: .08em; text-transform: uppercase; }
+.y16 .field input {
+  background: #fff;
+  border: 1.5px solid var(--ink);
+  border-bottom-width: 4px;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--ink);
+  font: 400 18px var(--jos);
+  height: 48px;
+  letter-spacing: 0;
+  padding: 4px 12px 0;
+  text-transform: none;
+}
+.y16 .field input:focus { border-color: var(--ink); box-shadow: none; }
+.y16 .field input:focus-visible { outline: 3px solid var(--focus); }
+
+/* white yearbook page with a mint edge and a soft top shadow */
+.y16 .paper { background: var(--paper); border-right: 12px solid var(--mint); box-shadow: inset 0 14px 18px -16px rgb(0 0 0 / 30%); padding: 84px 72px 110px; position: relative; }
+
+/* decorative page number (aria-hidden) */
+.y16 .folio { bottom: 18px; font: 400 14px/1 var(--jos); left: 28px; letter-spacing: .02em; position: absolute; }
+.y16 .folio b { font-weight: 400; margin-right: 14px; }
+.y16 .folio.r { display: flex; flex-direction: row-reverse; gap: 14px; left: auto; right: 28px; }
+.y16 .folio.r b { margin: 0; }
+
+/* yellow and pink corner wedge (aria-hidden); keep text and controls clear of it */
+.y16 .wedge { background: var(--yellow); bottom: 0; clip-path: polygon(0 100%, 0 62%, 38% 100%, 62% 100%, 100% 0, 100% 100%); height: 150px; left: 0; pointer-events: none; position: absolute; right: 0; }
+.y16 .wedge::after { background: var(--pink); clip-path: polygon(0 100%, 0 82%, 20% 100%); content: ""; inset: 0; position: absolute; }
+
+/* two-line headline, second word green: <h2 class="twist">Sign <b>it</b></h2> */
+.y16 .twist { font: 800 58px/.86 var(--exo); letter-spacing: -.02em; }
+.y16 .twist b { color: var(--green-d); display: block; padding-left: 1.6em; }
+
+@media (max-width: 600px) {
+  .y16 .paper { border-right-width: 6px; padding: 48px 20px 96px; }
+  .y16 .folio { bottom: 12px; font-size: 12px; left: 16px; }
+  .y16 .folio.r { left: auto; right: 22px; }
+  .y16 .wedge { height: 80px; }
+  .y16 .twist { font-size: 40px; }
+}
