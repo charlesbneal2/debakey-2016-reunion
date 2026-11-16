@@ -530,7 +530,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .home .fine { color: var(--ink-2); font-size: 14px; text-align: center; }
 .home .form-status { color: var(--refuse); font-size: 15px; font-weight: 600; margin: 0; }
 .home .form-status:empty { display: none; }
-.home .sales-closed { background: none; border: 0; border-radius: 0; border-top: 1.5px solid var(--ink); box-shadow: none; font: 400 24px/1.2 var(--did); grid-column: 1; margin-top: 8px; max-width: 30ch; padding: 14px 0 0; }
+.home .sales-closed { background: none; border: 0; border-radius: 0; border-top: 1.5px solid var(--ink); box-shadow: none; font: 400 24px/1.2 var(--did); grid-column: 1; margin-top: 8px; max-width: 30ch; padding: 14px 0 0; text-align: left; }
 .home .tickets .folio { z-index: 0; }
 
 /* footer: mint, school lockup, questions, links */
@@ -542,14 +542,16 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .home .lockup .school { font: 600 13px/1.25 var(--jos); letter-spacing: .04em; }
 .home .closed-note { color: var(--ink); font-weight: 500; }
 
+@media (max-width: 860px) {
+  .home .yearbook { gap: 34px; grid-template-columns: 1fr; }
+  .home .book-link { justify-self: center; }
+  .home .ybk-txt { gap: 18px; justify-items: center; text-align: center; }
+}
 @media (max-width: 800px) {
   .home .tickets { grid-template-columns: minmax(0, 1fr); }
   .home .tickets .copy, .home .ticket-form, .home .sales-closed { grid-column: 1; grid-row: auto; max-width: none; }
 }
 @media (max-width: 600px) {
-  .home .yearbook { gap: 34px; grid-template-columns: 1fr; }
-  .home .book-link { justify-self: center; }
-  .home .ybk-txt { gap: 18px; justify-items: center; text-align: center; }
   .home .arrows i { height: 30px; width: 24px; }
   .home .tickets { gap: 16px; }
   .home .tickets .copy { font-size: 17px; }

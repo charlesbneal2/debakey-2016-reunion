@@ -100,7 +100,7 @@ async function pixel(page, x, y) {
 
 const overlaps = (a, b) => a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
 
-for (const [width, height] of [[320, 568], [360, 640], [390, 844], [768, 1024], [844, 390], [1280, 800], [1440, 900], [1920, 1080]]) {
+for (const [width, height] of [[320, 568], [360, 640], [390, 844], [601, 900], [700, 900], [768, 1024], [801, 900], [844, 390], [1280, 800], [1440, 900], [1920, 1080]]) {
   await test(`cover lockup sits on mint, clear of the facts, at ${width}x${height}`, async (open) => {
     const page = await open({ width, height });
     await page.goto(BASE);
