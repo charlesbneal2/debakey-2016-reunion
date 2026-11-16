@@ -199,48 +199,28 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .prose h2 { font-size: 1.1rem; margin-top: 32px; }
 .prose p { color: #3f3f46; margin: 10px 0; }
 
-/* Door check-in */
-.door { background: var(--surface); min-height: 100svh; }
-.door-panel { display: grid; gap: 18px; margin: 32px auto; text-align: left; width: calc(100% - 32px); }
-.door-panel .form-status { margin: 0; }
-.door-desk { margin: 0 auto; max-width: 560px; padding: 16px; }
-.door-desk h1 { font-size: 1.4rem; margin-bottom: 12px; }
-.reader { background: var(--background); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-.door-search { align-items: end; display: grid; gap: 10px; grid-template-columns: 1fr auto; margin-top: 16px; }
-.matches { list-style: none; margin: 16px 0 0; padding: 0; }
-.matches li {
-  align-items: center;
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  display: flex;
-  gap: 12px;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  overflow-wrap: anywhere;
-  padding: 10px 12px;
-}
-.matches small { color: var(--muted); text-align: right; }
-.matches .button { flex: none; font-size: .88rem; height: 36px; padding: 0 14px; }
-.result {
-  align-items: center;
-  color: var(--white);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  inset: 0;
-  justify-content: center;
-  overflow-wrap: anywhere;
-  padding: 24px;
-  position: fixed;
-  text-align: center;
-  z-index: 10;
-}
-.result[data-state="good"] { background: #15803d; }
-.result[data-state="bad"] { background: #b91c1c; }
+/* Door check-in (Direction A): charcoal page, one centred column; body is .y16.charcoal */
+.door { margin: 0 auto; max-width: 560px; min-height: 100svh; padding: 28px 22px; }
+.door h1 { font: 800 italic 34px/1 var(--exo); margin: 0 0 22px; }
+.dpanel, .door-desk { display: grid; gap: 18px; }
+.dpanel { background: var(--mint); color: var(--ink); margin-top: 90px; padding: 26px 22px; --focus: var(--ink); }
+.dpanel h1 { margin: 0; }
+.dpanel .form-status { color: var(--refuse); font-weight: 600; margin: 0; }
+.door-desk .field { color: #fff; }
+.door-desk .form-status, .door-desk .camera-status { color: #fff; margin: 0; }
+.reader { background: #111; border: 3px solid var(--lime); overflow: hidden; }
+.door-search { align-items: end; display: grid; gap: 10px; grid-template-columns: 1fr auto; }
+.matches { display: grid; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.matches li { align-items: center; background: #fff; color: var(--ink); display: flex; gap: 10px; justify-content: space-between; overflow-wrap: anywhere; padding: 12px 14px; }
+.matches span { font: 400 21px/1.1 var(--did); }
+.matches small { font-size: 15px; text-align: right; }
+.result { align-items: center; display: flex; flex-direction: column; gap: 14px; inset: 0; justify-content: center; overflow-wrap: anywhere; padding: 24px; position: fixed; text-align: center; z-index: 10; }
+.result[data-state="good"] { background: var(--lime); color: var(--ink); --focus: var(--ink); }
+.result[data-state="bad"] { background: var(--refuse); color: #fff; --focus: #fff; }
 .result p { margin: 0; }
-.result-title { font-size: clamp(2rem, 10vw, 3.5rem); font-weight: 700; letter-spacing: -.03em; line-height: 1.15; }
-.result-label { font-size: clamp(1.2rem, 6vw, 2rem); }
+.result-title { font: 900 italic 54px/1 var(--exo); }
+.result[data-state="bad"] .result-title { font-size: 38px; line-height: 1.1; }
+.result .result-label { font: 400 30px/1.1 var(--did); margin-bottom: 16px; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -579,7 +559,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
   color: var(--ink);
   font: 400 17px/1.5 var(--jos);
 }
-.y16 .charcoal { --focus: var(--lime); background: var(--char); color: #fff; }
+.y16.charcoal, .y16 .charcoal { --focus: var(--lime); background: var(--char); color: #fff; }
 
 /* one focus ring for buttons, links, fields, chips and viewer controls */
 .y16 :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }

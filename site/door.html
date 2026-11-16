@@ -6,11 +6,13 @@
   <meta name="robots" content="noindex">
   <title>Door Check-In | DeBakey Reunion</title>
   <link rel="icon" href="assets/favicon.png">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Exo+2:ital,wght@0,700;0,800;1,800;1,900&family=Josefin+Sans:wght@300;400;600&display=swap">
+  <link rel="stylesheet" href="styles.css?v=7">
 </head>
-<body class="door">
-  <form id="login" class="panel door-panel">
+<body class="door y16 charcoal">
+  <form id="login" class="dpanel">
     <h1>Door check-in</h1>
     <label class="field" for="password">Door password
       <input id="password" type="password" autocomplete="current-password" required>
@@ -22,7 +24,7 @@
   <main id="desk" class="door-desk" hidden>
     <h1>Check-in</h1>
     <div id="reader" class="reader"></div>
-    <p id="camera-status" class="muted" role="status"></p>
+    <p id="camera-status" class="camera-status" role="status"></p>
 
     <form id="search" class="door-search">
       <label class="field" for="query">Find by name
