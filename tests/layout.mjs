@@ -433,8 +433,10 @@ await test("door success is green with label, and posts the ticket token", async
   const scan = posts.find((p) => p.action === "scan");
   assert.equal(scan.scanned, "tok-1");
   await page.screenshot({ path: join(SHOTS, "door-ok-360.png") });
+  assert.equal(await page.locator("#desk").evaluate((el) => el.inert), true, "desk is inert under the result");
   await page.getByRole("button", { name: "Next" }).click();
   assert.equal(await result.isVisible(), false);
+  assert.equal(await page.locator("#desk").evaluate((el) => el.inert), false);
 });
 
 await test("door repeat scan is red with Central time", async (open) => {

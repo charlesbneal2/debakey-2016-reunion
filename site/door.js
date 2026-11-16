@@ -58,6 +58,7 @@ function showResult(state, title, label = "") {
   $("result-title").textContent = title;
   $("result-label").textContent = label;
   $("result").hidden = false;
+  $("desk").inert = true; // the result covers the desk; keep Tab out from under it
   $("next").focus();
 }
 
@@ -180,6 +181,7 @@ $("search").addEventListener("submit", async (event) => {
 
 $("next").addEventListener("click", () => {
   $("result").hidden = true;
+  $("desk").inert = false;
   $("matches").replaceChildren();
   $("query").value = "";
   lastScan.at = Date.now();

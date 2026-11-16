@@ -13,7 +13,7 @@
 </head>
 <body class="yearbook-page y16 charcoal">
   <header class="yb-header">
-    <a href="./" class="yb-back icon-button" aria-label="Reunion home"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <a href="./" class="yb-back icon-button" aria-label="Reunion home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
     <h1 class="sr-only">2016 Yearbook</h1>
     <div class="yb-chev" aria-hidden="true"><div><b style="background:#e42648"></b><b style="background:#fc8c16"></b><b style="background:#06c1ff"></b><b style="background:#feda08"></b></div><div><b style="background:#06c1ff"></b><b style="background:#e42648"></b><b style="background:#abec0d"></b><b style="background:#fc8c16"></b></div><div><b style="background:#feda08"></b><b style="background:#abec0d"></b><b style="background:#e42648"></b><b style="background:#06c1ff"></b></div></div>
   </header>
@@ -30,22 +30,22 @@
     </div>
 
     <nav class="yb-controls" aria-label="Yearbook pages">
-      <button id="prev" class="icon-button" type="button" aria-label="Previous page"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button id="prev" class="icon-button" type="button" aria-label="Previous page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
       <button id="contents-toggle" class="pill-button yb-label" type="button" popovertarget="contents">
         <span id="page-indicator" class="yb-indicator" aria-live="polite"><span class="yb-chapter"></span><span class="yb-pages"></span></span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>
       </button>
-      <button id="next" class="icon-button" type="button" aria-label="Next page"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button id="next" class="icon-button" type="button" aria-label="Next page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
       <span class="yb-sep" aria-hidden="true"></span>
-      <button id="portraits-jump" class="pill-button yb-wide-only" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Portraits</button>
-      <button id="sign-jump" class="pill-button" type="button"><svg viewBox="0 0 24 24"><path d="M4 20l4-1L19 8l-3-3L5 16l-1 4zM14 7l3 3"/></svg>Sign</button>
+      <button id="portraits-jump" class="pill-button yb-wide-only" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Portraits</button>
+      <button id="sign-jump" class="pill-button" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l4-1L19 8l-3-3L5 16l-1 4zM14 7l3 3"/></svg>Sign</button>
     </nav>
   </main>
 
   <div id="contents" class="yb-contents" popover role="dialog" aria-labelledby="contents-title">
     <div class="yb-contents-head">
       <h2 id="contents-title">Contents</h2>
-      <button class="icon-button" type="button" popovertarget="contents" popovertargetaction="hide" aria-label="Close contents"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <button class="icon-button" type="button" popovertarget="contents" popovertargetaction="hide" aria-label="Close contents"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <form id="goto" class="yb-goto field">
       <label for="goto-page">Go to page</label>
@@ -58,7 +58,7 @@
 
   <div id="signer" class="signer" role="dialog" aria-modal="true" aria-label="Sign the yearbook" hidden>
     <div class="signer-bar">
-      <button id="signer-close" class="button button-small" type="button"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Book</button>
+      <button id="signer-close" class="button button-small" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Book</button>
       <p class="signer-hint">Tap anywhere to write. Pinch or scroll to zoom.</p>
       <button id="write-here" class="button button-small" type="button">Write here</button>
     </div>

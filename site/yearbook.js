@@ -93,7 +93,7 @@
     const li = document.createElement("li");
     c.button = document.createElement("button");
     c.button.type = "button";
-    c.button.innerHTML = `<img src="yearbook/thumbs/${String(c.page).padStart(3, "0")}.jpg" alt="" width="30" height="40" loading="lazy"><span>${c.name}</span><small>p. ${c.page}</small>`;
+    c.button.innerHTML = `<img src="yearbook/thumbs/${String(c.page).padStart(3, "0")}.jpg" alt="" width="30" height="40" loading="lazy"><span>${c.name}</span> <small>p. ${c.page}</small>`;
     c.button.addEventListener("click", () => go(fileOf(c.page)));
     li.append(c.button);
     chapterList.append(li);

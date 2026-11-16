@@ -321,6 +321,11 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .signer-status { bottom: 76px; color: #fff; font: 600 15px/1 var(--jos); isolation: isolate; left: 50%; margin: 0; padding: 14px 30px 11px; position: absolute; transform: translateX(-50%); white-space: nowrap; }
 .signer-status::before { background: var(--ink); clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); content: ""; inset: 0; position: absolute; z-index: -1; }
 @media (max-width: 560px) { .signer-hint { display: none; } }
+/* forced colors drop the ink/mint fills, so give the bar, the contents panel, the status and the bare buttons an edge */
+@media (forced-colors: active) {
+  .yb-controls, .yb-contents, .signer-status { outline: 2px solid CanvasText; }
+  .yearbook-page .icon-button, .yearbook-page .pill-button { border: 1px solid ButtonText; }
+}
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
 /* ===== Home page: scoped to body.home (with .y16 for tokens and fonts) ===== */
@@ -488,7 +493,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .home .chip b { font: 400 22px/1 var(--did); }
 .home .chip input:checked + span { background: var(--ink); box-shadow: 6px 6px 0 var(--cyan); color: #fff; }
 .home .chip input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 3px; }
-.home .field small { font: inherit; letter-spacing: 0; text-transform: none; }
+.home .field small { color: inherit; font: inherit; letter-spacing: 0; text-transform: none; } /* base grey was 3.7:1 on peach */
 .home .ticket-form .button { width: 100%; }
 .home .fine { color: var(--ink-2); font-size: 14px; text-align: center; }
 .home .form-status { color: var(--refuse); font-size: 15px; font-weight: 600; margin: 0; }
