@@ -425,7 +425,7 @@ img { max-width: 100%; height: auto; }
 .home .field small { color: inherit; font: inherit; letter-spacing: 0; text-transform: none; } /* base grey was 3.7:1 on peach */
 .home .ticket-form .button { width: 100%; }
 .home .fine { color: var(--ink-2); font-size: 16px; text-align: center; }
-.home .form-status { color: var(--refuse); font-size: 15px; font-weight: 600; margin: 0; }
+.home .form-status { color: var(--refuse); font-size: 16px; font-weight: 600; margin: 0; }
 .home .form-status:empty { display: none; }
 .home .sales-closed { background: none; border: 0; border-radius: 0; border-top: 1.5px solid var(--ink); box-shadow: none; font: 400 24px/1.2 var(--did); grid-column: 1; margin-top: 8px; max-width: 30ch; padding: 14px 0 0; text-align: left; }
 .home .tickets .folio { z-index: 0; }
@@ -624,5 +624,4 @@ img { max-width: 100%; height: auto; }
   .ticket .portrait:has(#qr:not([hidden])) h1 { font-size: 26px; }
   .ticket .portrait:has(#qr:not([hidden])) { padding: 16px 16px 0; }
   .ticket .portrait:has(#qr:not([hidden])) h1 { margin: 16px -16px 0; }
-  .ticket .event { font-size: 15px; }
 }
