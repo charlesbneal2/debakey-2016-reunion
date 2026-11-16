@@ -321,6 +321,11 @@ await test("thanks page explains next steps", async (open) => {
   await page.getByText("15 minutes").waitFor();
   assert.ok(await page.locator('a[href="mailto:info@debakey2016reunion.com"]').count());
   assert.equal(await noOverflow(page), true);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  assert.equal(await noOverflow(page), true);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const names = await page.locator(".ptrack").evaluateAll((els) => els.map((el) => getComputedStyle(el).animationName));
+  assert.deepEqual(names, ["none", "none", "none"]);
 });
 
 await test("ticket page shows QR and literal label", async (open) => {

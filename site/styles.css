@@ -660,3 +660,51 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
   .y16 .wedge { height: 80px; }
   .y16 .twist { font-size: 40px; }
 }
+
+/* ===== Thanks page: Direction A endsheet with the senior-portrait band (body.thanks.y16) =====
+   --u is the mock's px scale: .4px on phones, 1px from 1140px up, and scaled with the viewport in between
+   so the rotated headline always ends on screen. */
+.thanks { --u: .4px; }
+.thanks .hero {
+  background: radial-gradient(120% 90% at 30% 40%, #e6f8e4 0, var(--mint) 60%, #cfe9cf 100%);
+  min-height: max(640px, 100svh);
+  overflow: hidden; /* the rotated band is wider than the screen */
+  position: relative;
+}
+.thanks p { margin: 0; }
+/* ponytail: band and tracks are long enough for a 2560x1440 screen; add tiles if rows end on screen wider than that. */
+.thanks .band { left: 60px; position: absolute; top: -20px; transform: rotate(24deg); transform-origin: 0 0; width: calc(4000 * var(--u)); }
+.thanks .band h1 { font: italic 800 min(54px, 11.5vw)/1 var(--exo); letter-spacing: -.01em; margin: 0 0 8px 70px; white-space: nowrap; } /* 11.5vw: rotated end stays on a 320px screen */
+.thanks .band h1 b { font-weight: 900; }
+/* Portrait rows. Sprites: 144px tiles on a 154px pitch, first tile at x=5, transparent 10px gaps. Each tile is one
+   portrait scaled to the row height (--H), so the parallelogram never reaches a gap; the negative margin tucks the
+   slants together leaving a 10px (scaled) slanted gap. Each track holds its tiles twice and moves -50%: one exact set. */
+.thanks .prow { --H: calc(86 * var(--u)); height: var(--H); margin: 0 0 calc(10 * var(--u)) calc(var(--o) * var(--u)); overflow: hidden; }
+.thanks .ptrack { animation: pslide var(--d) linear infinite; display: flex; width: max-content; }
+.thanks .prow.rev .ptrack { animation-direction: reverse; }
+.thanks .ptrack i {
+  background: var(--f) calc(var(--H) * (5 + 154 * var(--n)) / -144) 0 / auto var(--H) no-repeat;
+  clip-path: polygon(calc(var(--H) * .33) 0, 100% 0, calc(100% - var(--H) * .33) 100%, 0 100%);
+  flex: none;
+  height: var(--H);
+  margin-right: calc(10 * var(--u) - var(--H) * .33);
+  width: var(--H);
+}
+@keyframes pslide { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .thanks .ptrack { animation: none; } }
+.thanks .lead { bottom: 44px; display: grid; gap: 11px; justify-items: start; left: 20px; position: absolute; right: 20px; z-index: 2; }
+.thanks .big { font: 400 21px/1.25 var(--did); }
+.thanks .event { font-size: 15px; }
+.thanks .contact { font-size: 15px; }
+.thanks .contact a { color: inherit; text-underline-offset: 3px; }
+@media (min-width: 601px) {
+  .thanks { --u: min(1px, 100vw / 1140); }
+  .thanks .hero { min-height: max(720px, 100svh); }
+  /* centre-fold shading */
+  .thanks .hero::after { background: linear-gradient(90deg, transparent, rgb(0 0 0 / 7%) 48%, rgb(0 0 0 / 12%) 50%, rgb(255 255 255 / 25%) 52%, transparent); bottom: 0; content: ""; left: 50%; margin-left: -35px; pointer-events: none; position: absolute; top: 0; width: 70px; }
+  .thanks .band { left: calc(440 * var(--u)); top: calc(-60 * var(--u)); }
+  .thanks .band h1 { font-size: calc(96 * var(--u)); margin: 0 0 calc(16 * var(--u)) calc(200 * var(--u)); }
+  .thanks .lead { bottom: 64px; gap: 16px; left: 56px; right: auto; width: 500px; }
+  .thanks .big { font-size: 26px; }
+  .thanks .event { font-size: 17px; }
+}
