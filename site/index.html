@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Exo+2:ital,wght@0,700;0,800;1,800;1,900&family=Josefin+Sans:wght@300;400;600&display=swap">
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body class="home y16">
   <header id="cover" class="cover">
@@ -42,15 +42,19 @@
   </header>
 
   <main>
-    <section id="yearbook" class="section yearbook" aria-labelledby="yearbook-title">
+    <section id="yearbook" class="section paper yearbook" aria-labelledby="yearbook-title">
       <a class="book-link" href="yearbook.html" aria-labelledby="yearbook-title">
         <div class="book"><img src="yearbook/pages/front.webp" width="1044" height="1400" loading="lazy" alt="2016 yearbook cover: From Every Angle"></div>
       </a>
-      <h2 id="yearbook-title" class="book-title">The 2016 Yearbook</h2>
-      <div class="yearbook-actions">
-        <a class="button button-glass glass" href="yearbook.html">Open</a>
-        <a class="button button-glass glass" href="yearbook.html#sign">Sign it</a>
+      <div class="ybk-txt">
+        <h2 id="yearbook-title" class="twist">The 2016 <b>Yearbook</b></h2>
+        <div class="arrows" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <div class="yearbook-actions">
+          <a class="button" href="yearbook.html">Open</a>
+          <a class="button button-alt" href="yearbook.html#sign">Sign it</a>
+        </div>
       </div>
+      <p class="folio" aria-hidden="true"><b>2</b> The Yearbook</p>
     </section>
 
     <section id="guests" class="section guests" aria-labelledby="guests-title" hidden>
@@ -62,42 +66,44 @@
       </div>
     </section>
 
-    <section id="tickets" class="section tickets" aria-labelledby="tickets-title">
-      <div class="wrap wrap-narrow">
-        <h2 id="tickets-title">Get your tickets</h2>
-        <p class="muted">$15 each, with entry and one free drink. We'll email a QR code for each person to show at the door.</p>
+    <section id="tickets" class="section paper tickets" aria-labelledby="tickets-title">
+      <h2 id="tickets-title" class="twist">Get your <b>tickets</b></h2>
+      <p class="copy">$15 each, with entry and one free drink. We'll email a QR code for each person to show at the door.</p>
 
-        <form id="ticket-form" class="ticket-form glass" novalidate>
-          <fieldset>
-            <legend>Who's coming with you?</legend>
-            <label class="choice"><input type="radio" name="party" value="solo" checked> <span>Just me, $15</span></label>
-            <label class="choice"><input type="radio" name="party" value="guest"> <span>Me + guest, $30</span></label>
-          </fieldset>
+      <form id="ticket-form" class="ticket-form" novalidate>
+        <fieldset>
+          <legend>Who's coming with you?</legend>
+          <label class="chip"><input type="radio" name="party" value="solo" checked><span>Just me<i>,</i> <b>$15</b></span></label>
+          <label class="chip"><input type="radio" name="party" value="guest"><span>Me + guest<i>,</i> <b>$30</b></span></label>
+        </fieldset>
 
-          <label class="field" for="name">Your name
-            <input id="name" name="name" type="text" maxlength="80" autocomplete="name" required>
-          </label>
+        <label class="field" for="name">Your name
+          <input id="name" name="name" type="text" maxlength="80" autocomplete="name" required>
+        </label>
 
-          <label class="field" id="guest-field" for="guest-name" hidden>Guest's name <small>(optional)</small>
-            <input id="guest-name" name="guest_name" type="text" maxlength="80" autocomplete="off">
-          </label>
+        <label class="field" id="guest-field" for="guest-name" hidden>Guest's name <small>(optional)</small>
+          <input id="guest-name" name="guest_name" type="text" maxlength="80" autocomplete="off">
+        </label>
 
-          <!-- ponytail: guest list paused; remove hidden here and restore loadGuests() in app.js to bring it back --><label class="check" hidden><input id="show-on-list" type="checkbox"> <span>Show my name on the list</span></label>
+        <!-- ponytail: guest list paused; remove hidden here and restore loadGuests() in app.js to bring it back --><label class="check" hidden><input id="show-on-list" type="checkbox"> <span>Show my name on the list</span></label>
 
-          <button id="submit" class="button" type="submit">Continue to payment</button>
-          <p class="fine">Secure payment by Stripe. You'll enter your email and card on the next page.</p>
-          <p id="form-status" class="form-status" role="alert"></p>
-        </form>
+        <button id="submit" class="button" type="submit">Continue to payment</button>
+        <p class="fine">Secure payment by Stripe. You'll enter your email and card on the next page.</p>
+        <p id="form-status" class="form-status" role="alert"></p>
+      </form>
 
-        <p id="sales-closed" class="sales-closed" hidden>Ticket sales have closed.</p>
-        <noscript><p class="form-status">Tickets need JavaScript. Email info@debakey2016reunion.com for help.</p></noscript>
-      </div>
+      <p id="sales-closed" class="sales-closed" hidden>Ticket sales have closed.</p>
+      <noscript><p class="form-status">Tickets need JavaScript. Email info@debakey2016reunion.com for help.</p></noscript>
+      <div class="wedge" aria-hidden="true"></div>
+      <p class="folio r" aria-hidden="true"><b>3</b> Tickets</p>
     </section>
   </main>
 
   <footer id="questions" class="questions">
-    <img class="seal" src="assets/logo.svg" width="343" height="325" alt="DeBakey High School for Health Professions logo">
-    <p class="school">DeBakey High School<br>for Health Professions</p>
+    <div class="lockup">
+      <img class="seal" src="assets/logo.svg" width="343" height="325" alt="DeBakey High School for Health Professions logo">
+      <p class="school">DeBakey High School<br>for Health Professions</p>
+    </div>
     <p>Questions? <a href="mailto:info@debakey2016reunion.com">info@debakey2016reunion.com</a></p>
     <p><a href="https://www.google.com/maps/search/?api=1&amp;query=Eureka+Heights+Brewery+941+W+18th+St+Houston+TX+77008" target="_blank" rel="noopener">Find Eureka Heights Brewery on the map</a> &middot; <a href="privacy">Privacy</a></p>
   </footer>

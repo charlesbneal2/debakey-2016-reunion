@@ -474,19 +474,13 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
   .home .facts .button { margin-top: 0; }
 }
 
-.home .seal { height: auto; width: 88px; }
+/* ---------- below the hero: yearbook, tickets, footer ---------- */
+.home .paper h2 { margin: 0; }
+.home .paper p { margin: 0; }
 
-
-/* ---------- sections ---------- */
-.home .section { padding: clamp(44px, 7vw, 80px) 16px; }
-.home .wrap { max-width: 960px; margin: 0 auto; }
-.home .wrap-narrow { max-width: 520px; }
-.home h2 { font-size: clamp(2rem, 6vw, 3rem); }
-.home .muted { color: var(--ink-2); }
-
-/* ---------- yearbook entry: the book is the invitation ---------- */
-.home .yearbook { text-align: center; }
-.home .book-link { display: inline-block; perspective: 1400px; text-decoration: none; padding: 10px 40px 0; }
+/* yearbook: the existing 3D book on the left, headline and buttons on the right */
+.home .yearbook { align-items: center; display: grid; gap: 32px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.home .book-link { display: inline-block; justify-self: end; padding: 10px 24px 0; perspective: 1400px; text-decoration: none; }
 .home .book {
   --w: clamp(190px, 44vw, 260px);
   --t: 34px;                                   /* thickness */
@@ -495,10 +489,9 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
   aspect-ratio: 1044 / 1400;
   transform-style: preserve-3d;
   transform: rotateY(-26deg) rotateX(5deg);
-  transition: transform .7s var(--ease);
+  transition: transform .7s var(--ease, ease);
 }
-.home .book img { border-radius: 2px 5px 5px 2px; display: block; height: 100%; object-fit: cover; transform: translateZ(calc(var(--t) / 2)); width: 100%;
-  box-shadow: inset 4px 0 6px -2px rgb(0 0 0 / 35%); }
+.home .book img { border-radius: 2px 5px 5px 2px; box-shadow: inset 4px 0 6px -2px rgb(0 0 0 / 35%); display: block; height: 100%; object-fit: cover; transform: translateZ(calc(var(--t) / 2)); width: 100%; }
 .home .book::before {                                 /* page block on the fore-edge */
   content: ""; position: absolute; left: 0; top: 1.2%; height: 97.6%; width: var(--t);
   transform: translateX(calc(var(--w) - var(--t) / 2 - 3px)) rotateY(90deg);
@@ -508,48 +501,62 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
   content: ""; position: absolute; inset: 0; border-radius: 2px 5px 5px 2px;
   transform: translateZ(calc(var(--t) / -2));
   background: #b9dcc0;
-  box-shadow: -14px 26px 50px 0 var(--glass-shadow);
+  box-shadow: -14px 26px 50px 0 rgb(0 0 0 / 40%);
 }
 .home .book-link:hover .book, .home .book-link:focus-visible .book { transform: rotateY(-10deg) rotateX(2deg) translateY(-6px); }
-.home .book-title { display: block; font-family: var(--serif); font-size: clamp(1.7rem, 5vw, 2.3rem); font-style: italic; margin-top: 34px; }
-.home .yearbook-actions { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+.home .ybk-txt { display: grid; gap: 26px; justify-items: start; }
+.home .arrows { display: flex; gap: 6px; }
+.home .arrows i { background: var(--pink); clip-path: polygon(0 0, 45% 0, 100% 50%, 45% 100%, 0 100%, 55% 50%); height: 44px; width: 34px; }
+.home .arrows i:nth-child(2) { background: var(--orange); }
+.home .arrows i:nth-child(3) { background: var(--yellow); }
+.home .arrows i:nth-child(4) { background: var(--cyan); }
+.home .yearbook-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 
-/* ---------- tickets ---------- */
-.home .tickets .wrap { text-align: center; }
-.home .tickets .muted { margin: 12px auto 0; max-width: 30em; }
-.home .ticket-form { border-radius: 26px; display: grid; gap: 18px; margin-top: 30px; padding: clamp(20px, 5vw, 30px); text-align: left; }
-.home fieldset { border: 0; display: grid; gap: 8px; grid-template-columns: 1fr 1fr; margin: 0; padding: 0; }
-.home legend { font-size: .9rem; font-weight: 500; margin-bottom: 10px; padding: 0; }
-.home .choice { align-items: center; background: var(--field); border: 1px solid var(--field-edge); border-radius: 14px; cursor: pointer; display: flex; font-size: .95rem; gap: 10px; padding: 13px 14px; transition: border-color .2s, background-color .2s; }
-.home .choice:has(input:checked) { background: color-mix(in srgb, var(--accent) 18%, transparent); border-color: var(--accent); }
-.home .choice input { accent-color: var(--accent); margin: 0; }
-.home .field { display: grid; font-size: .9rem; font-weight: 500; gap: 8px; }
-.home .field input { background: var(--field); border: 1px solid var(--field-edge); border-radius: 14px; color: var(--ink); font: 400 1rem var(--sans); height: 48px; padding: 0 14px; width: 100%; }
-.home .field input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+/* tickets: copy left, peach form right, wedge along the bottom */
+.home .tickets { align-items: start; display: grid; gap: 24px 64px; grid-template-columns: minmax(0, 1fr) minmax(0, 480px); }
+.home .tickets .copy { font-size: 19px; grid-column: 1; max-width: 30ch; }
+.home .ticket-form { background: var(--peach); border: 0; border-radius: 0; box-shadow: none; backdrop-filter: none; display: grid; gap: 22px; grid-column: 2; grid-row: 1 / span 4; padding: 30px 30px 26px; position: relative; z-index: 1; }
+.home .ticket-form fieldset { border: 0; display: grid; gap: 10px; grid-template-columns: 1fr 1fr; margin: 0; min-width: 0; padding: 0; }
+.home .ticket-form legend { font: 400 24px/1.2 var(--did); margin-bottom: 12px; padding: 0; }
+.home .chip { cursor: pointer; display: block; position: relative; }
+.home .chip input { inset: 0; margin: 0; opacity: 0; position: absolute; }
+.home .chip span { align-items: baseline; background: #fff; border: 1.5px solid var(--ink); display: flex; font: 600 16px/1.1 var(--jos); gap: 8px; justify-content: space-between; padding: 14px 16px 11px; }
+.home .chip i { clip-path: inset(50%); height: 1px; overflow: hidden; position: absolute; width: 1px; }  /* comma for the accessible name only */
+.home .chip b { font: 400 22px/1 var(--did); }
+.home .chip input:checked + span { background: var(--ink); box-shadow: 6px 6px 0 var(--cyan); color: #fff; }
+.home .chip input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 3px; }
+.home .field small { font: inherit; letter-spacing: 0; text-transform: none; }
 .home .ticket-form .button { width: 100%; }
-.home .fine { color: var(--ink-3); font-size: .8rem; margin: -6px 0 0; text-align: center; }
+.home .fine { color: var(--ink-2); font-size: 14px; text-align: center; }
+.home .form-status { color: var(--refuse); font-size: 15px; font-weight: 600; margin: 0; }
+.home .form-status:empty { display: none; }
+.home .sales-closed { background: none; border: 0; border-radius: 0; border-top: 1.5px solid var(--ink); box-shadow: none; font: 400 24px/1.2 var(--did); grid-column: 1; margin-top: 8px; max-width: 30ch; padding: 14px 0 0; }
+.home .tickets .folio { z-index: 0; }
 
-/* ---------- footer ---------- */
-.home .questions { color: var(--ink-3); font-size: .88rem; padding: 28px 16px 48px; text-align: center; }
-.home .questions p { margin: 4px 0; }
-.home .questions a { color: var(--ink-2); }
-
-@media (max-width: 560px) {
-  .home fieldset { grid-template-columns: 1fr; }
-}
-
-/* ---------- compatibility with shared rules and the ticket flow ---------- */
+/* footer: mint, school lockup, questions, links */
+.home .questions { background: var(--mint); color: var(--ink); display: grid; font-size: 16px; gap: 6px; padding: 34px 28px 40px; text-align: center; }
+.home .questions p { margin: 0; }
+.home .questions a { color: var(--ink); }
+.home .lockup { align-items: center; display: flex; gap: 12px; justify-content: center; margin-bottom: 10px; text-align: left; }
+.home .seal { height: auto; width: 58px; }
+.home .lockup .school { font: 600 13px/1.25 var(--jos); letter-spacing: .04em; }
 .home .closed-note { color: var(--ink); font-weight: 500; }
-.home .yearbook, .home .tickets { background: none; border-top: 0; }
-.home .section > .wrap > .muted { margin: 12px auto 0; }
-.home .form-status { color: var(--danger-ink); }
-.home .sales-closed { background: linear-gradient(135deg, var(--glass-a), var(--glass-b)); border: 1px solid var(--glass-edge); border-radius: 26px; color: var(--ink); font-family: var(--serif); font-size: 1.5rem; font-weight: 400; }
-.home .field small { color: var(--ink-3); }
-.home .check input { accent-color: var(--accent); }
-.home .questions { border-top: 0; color: var(--ink-3); }
-.home .eyebrow { color: var(--accent); }
-.home .choice:hover { border-color: var(--accent); }
-.home .field input { box-shadow: none; }
+
+@media (max-width: 800px) {
+  .home .tickets { grid-template-columns: minmax(0, 1fr); }
+  .home .tickets .copy, .home .ticket-form, .home .sales-closed { grid-column: 1; grid-row: auto; max-width: none; }
+}
+@media (max-width: 600px) {
+  .home .yearbook { gap: 34px; grid-template-columns: 1fr; }
+  .home .book-link { justify-self: center; }
+  .home .ybk-txt { gap: 18px; justify-items: center; text-align: center; }
+  .home .arrows i { height: 30px; width: 24px; }
+  .home .tickets { gap: 16px; }
+  .home .tickets .copy { font-size: 17px; }
+  .home .ticket-form { margin: 0 -6px; padding: 22px 18px 20px; }
+  .home .ticket-form fieldset { grid-template-columns: 1fr; }
+  .home .questions { font-size: 15px; padding: 26px 16px 30px; }
+}
 
 /* ================= .y16: yearbook reskin shared system =================
    Put class="y16" on <body> and add this font link (4 latin woff2, ~123 KiB):
