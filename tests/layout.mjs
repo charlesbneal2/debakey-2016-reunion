@@ -98,7 +98,9 @@ async function pixel(page, x, y) {
   }, `data:image/png;base64,${png.toString("base64")}`);
 }
 
-for (const [width, height] of [[320, 568], [360, 640], [390, 844]]) {
+const overlaps = (a, b) => a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+
+for (const [width, height] of [[320, 568], [360, 640], [390, 844], [768, 1024], [844, 390], [1280, 800], [1440, 900], [1920, 1080]]) {
   await test(`cover lockup sits on mint, clear of the facts, at ${width}x${height}`, async (open) => {
     const page = await open({ width, height });
     await page.goto(BASE);
@@ -111,8 +113,18 @@ for (const [width, height] of [[320, 568], [360, 640], [390, 844]]) {
     assert.ok(lock && facts, "lockup and facts panel are visible");
     const apart = lock.y + lock.height <= facts.y || facts.y + facts.height <= lock.y || lock.x + lock.width <= facts.x || facts.x + facts.width <= lock.x;
     assert.ok(apart, `lockup ${JSON.stringify(lock)} clear of facts ${JSON.stringify(facts)}`);
-    const chev = await page.locator("#cover .chev").boundingBox();
-    assert.ok(chev.y + chev.height <= lock.y, `chevrons end ${chev.y + chev.height} above lockup ${lock.y}`);
+    assert.equal(await noOverflow(page), true, "no horizontal scroll");
+    if (width < 1000) {
+      const chev = await page.locator("#cover .chev").boundingBox();
+      assert.ok(chev.y + chev.height <= lock.y, `chevrons end ${chev.y + chev.height} above lockup ${lock.y}`);
+    } else {
+      // Desktop: the grid shares rows with the lockup and panel, so check each tile's box.
+      for (const tile of await page.locator("#cover .chev div > *").all()) {
+        const box = await tile.boundingBox();
+        assert.ok(!overlaps(box, lock) && !overlaps(box, facts), `chevron tile ${JSON.stringify(box)} clear of lockup ${JSON.stringify(lock)} and facts ${JSON.stringify(facts)}`);
+      }
+      assert.ok(facts.x > lock.x + lock.width, "facts panel sits right of the lockup");
+    }
     await page.addStyleTag({ content: "#cover .lock, #cover .lock * { color: transparent !important; background: none !important; }" });
     const [l, t, r, b] = [lock.x + 1, lock.y + 1, lock.x + lock.width - 2, lock.y + lock.height - 2].map(Math.round);
     for (const [x, y] of [[l, t], [r, t], [l, b], [r, b]]) {

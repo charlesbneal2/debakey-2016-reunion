@@ -366,7 +366,9 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
    Back to front: photo (white wash baked in), mint diagonal (.lock::before), chevrons, lockup, facts.
    Content sits in flow at the bottom; the top padding keeps the chevron grid clear of the lockup. */
 .home .cover {
-  --cw: min(21vw, 12svh);                      /* chevron width; everything in the grid scales from it */
+  /* Chevron width; everything in the grid scales from it. min(21vw, 12svh) below 600px, min(12.5vw, 18.75svh, 160px)
+     from 1000px up; in between the width term holds at ~125px and the height term ramps from 12svh to 18.75svh. */
+  --cw: min(max(min(21vw, 125px), 12.5vw), clamp(12svh, 12svh + (100vw - 600px) * .17, 18.75svh), 160px);
   align-items: flex-start;
   background: #fff url(assets/cover/bg.webp) center / cover;
   color: var(--ink);
@@ -432,6 +434,45 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .home .facts { background: #fff; border-left: 6px solid var(--magenta); display: grid; font-size: 16px; gap: 7px; justify-items: start; max-width: 400px; padding: 12px 16px; width: 100%; }
 .home .facts p b { display: block; font: 700 17px/1.2 var(--exo); }
 .home .facts .button { margin-top: 6px; }
+
+/* Desktop: lockup bottom-left, facts bottom-right, teal chevrons over the lockup. Inner layout capped at 1280px
+   (--edge), photo full bleed. The top padding reserves column 1 (over the lockup); the facts' top margin adds the
+   extra depth of column 2 (over the panel), so tiles never reach the text. */
+@media (min-width: 1000px) {
+  .home .cover {
+    --edge: max(0px, (100% - 1280px) / 2);
+    align-items: flex-end;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: calc(var(--cw) * 3.16) calc(var(--edge) + 56px) 44px calc(var(--edge) + 80px);
+  }
+  /* ponytail: top is -.47cw, not the mock's -.2cw; at -.2cw column 1 runs into the lockup and column 2 under the panel at 1280x800. */
+  .home .chev { right: calc(var(--edge) + var(--cw) * .267); top: calc(var(--cw) * -.47); }
+  .home .lock { margin-bottom: 66px; }
+  .home .lock::before {
+    background: linear-gradient(#fff 0 3px, transparent 3px 39px, #fff 39px 44px, var(--mint2) 44px);
+    top: -44px;
+    transform: rotate(38deg);
+    transform-origin: 50% 44px;
+  }
+  /* Teal chevrons (--teal to #9fe0f0), sized from --cw like the grid; the bottom one tucks behind "Class of 2016". */
+  .home .lock::after {
+    aspect-ratio: 210 / 260;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 210 260'%3E%3ClinearGradient id='g' gradientUnits='userSpaceOnUse' x1='0' y1='0' x2='0' y2='120'%3E%3Cstop stop-color='%2380ead7'/%3E%3Cstop offset='1' stop-color='%239fe0f0'/%3E%3C/linearGradient%3E%3Cpath id='c' fill='url(%23g)' d='M0 0l105 43.2L210 0v48l-105 43.2L0 48z'/%3E%3Cuse href='%23c' y='70'/%3E%3Cuse href='%23c' y='140'/%3E%3C/svg%3E") 0 0 / 100% 100%;
+    bottom: calc(100% - var(--cw) * .45);
+    content: "";
+    left: 6px;
+    position: absolute;
+    width: calc(var(--cw) * 1.4);
+    z-index: -1;
+  }
+  .home .cad { font-size: min(22px, 1.83vw); }
+  .home .lock h1 { font-size: min(74px, 6.17vw); }
+  .home .lock h1 b { font-size: min(128px, 10.67vw); }
+  .home .facts { border-left-width: 10px; flex: none; font-size: 17px; gap: 10px; margin-top: calc(var(--cw) * .2); padding: 22px 24px; width: min(400px, 34vw); }
+  .home .facts p b { font-size: 20px; }
+  .home .facts .button { margin-top: 0; }
+}
 
 .home .seal { height: auto; width: 88px; }
 
