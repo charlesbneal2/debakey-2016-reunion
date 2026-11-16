@@ -716,8 +716,8 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .ticket .portrait h1 { font: 800 40px/.95 var(--exo); letter-spacing: -.02em; margin: 0; overflow-wrap: anywhere; }
 .ticket .portrait:has(#qr:not([hidden])) { background: var(--blue); box-shadow: 0 10px 24px -10px rgb(0 0 0 / 45%); padding: 18px 18px 0; }
 .ticket .portrait:has(#qr:not([hidden])) h1 { background: #fff; font: 400 30px/1.1 var(--did); letter-spacing: 0; margin: 18px -18px 0; padding: 12px 8px 8px; }
-/* Pure white, no filter, blend, rounding or shadow; 260px image plus 8px white margin of its own, on top of the PNG's built-in quiet zone. */
-.ticket .qr { background: #fff; border: 0; border-radius: 0; max-width: none; box-sizing: content-box; display: block; height: 260px; margin: 0 auto; padding: 8px; width: 260px; }
+/* Pure white, no filter, blend, rounding or shadow; 280px box = 264px image + 8px white padding, on top of the PNG quiet zone. Shrinks only below 360px wide. */
+.ticket .qr { aspect-ratio: 1; background: #fff; border: 0; border-radius: 0; box-sizing: border-box; display: block; height: auto; margin: 0 auto; max-width: calc(100vw - 78px); padding: 8px; width: 280px; }
 .ticket .copy { font: 600 19px var(--jos); margin: 0; }
 .ticket .copy:empty { display: none; }
 .ticket .event { font-size: 17px; margin: 0; }
@@ -726,5 +726,7 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 @media (max-width: 600px) {
   .ticket .portrait h1 { font-size: 32px; }
   .ticket .portrait:has(#qr:not([hidden])) h1 { font-size: 26px; }
+  .ticket .portrait:has(#qr:not([hidden])) { padding: 16px 16px 0; }
+  .ticket .portrait:has(#qr:not([hidden])) h1 { margin: 16px -16px 0; }
   .ticket .event { font-size: 15px; }
 }
