@@ -130,7 +130,7 @@ The page is now public, but it only takes test cards until you switch Stripe to 
   ```
 
 - [ ] Switch to live Stripe keys, price, and webhook secret (`docs/stripe-setup.md`, step 8)
-- [ ] Buy one real $15 ticket, get the email, scan it, then refund it in full
+- [ ] Buy one real $16 ticket, get the email, scan it, then refund it in full
 - [ ] Check the link preview by sending the URL to yourself in a chat
 - [ ] Share the link with the class
 

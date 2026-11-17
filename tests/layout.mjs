@@ -165,7 +165,7 @@ await test("guest name field appears only for +1", async (open) => {
   const page = await open();
   await page.goto(BASE);
   assert.equal(await page.getByLabel("Guest's name").isVisible(), false);
-  await page.getByLabel("Me + guest, $30").check();
+  await page.getByLabel("Me + guest, $32").check();
   assert.equal(await page.getByLabel("Guest's name").isVisible(), true);
 });
 
@@ -177,7 +177,7 @@ await test("+1 submit posts form and goes to Stripe", async (open) => {
     return json(route, { url: `${BASE}/stripe-mock` });
   });
   await page.goto(BASE);
-  await page.getByLabel("Me + guest, $30").check();
+  await page.getByLabel("Me + guest, $32").check();
   await page.getByLabel("Your name").fill("Jane Doe");
   await page.getByLabel("Guest's name").fill("Sam Guest");
   await page.getByRole("button", { name: "Continue to payment" }).click();
@@ -193,9 +193,9 @@ await test("guest name is not sent after switching back to just me", async (open
     return json(route, { url: `${BASE}/stripe-mock` });
   });
   await page.goto(BASE);
-  await page.getByLabel("Me + guest, $30").check();
+  await page.getByLabel("Me + guest, $32").check();
   await page.getByLabel("Guest's name").fill("Sam Guest");
-  await page.getByLabel("Just me, $15").check();
+  await page.getByLabel("Just me, $16").check();
   await page.getByLabel("Your name").fill("Jane Doe");
   await page.getByRole("button", { name: "Continue to payment" }).click();
   await page.waitForURL("**/stripe-mock");
