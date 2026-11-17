@@ -7,41 +7,14 @@ const centralTime = new Intl.DateTimeFormat("en-US", {
 });
 
 const $ = (id) => document.getElementById(id);
-let password = "";
 let busy = false;
 let lastScan = { text: "", at: 0 };
-
-function savePassword(value) {
-  password = value;
-  try {
-    sessionStorage.setItem("door-password", value);
-  } catch {
-    // Private browsing can block storage; the in-memory copy is enough.
-  }
-}
-
-function savedPassword() {
-  try {
-    return sessionStorage.getItem("door-password") ?? "";
-  } catch {
-    return "";
-  }
-}
-
-function forgetPassword() {
-  password = "";
-  try {
-    sessionStorage.removeItem("door-password");
-  } catch {
-    // Nothing stored.
-  }
-}
 
 async function callDoor(body) {
   const response = await fetch(`${window.FUNCTIONS_URL}/door`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ password, ...body }),
+    body: JSON.stringify({ token: await window.organizerAuth.token(), ...body }),
     signal: AbortSignal.timeout(15000),
   });
   return { status: response.status, data: await response.json() };
@@ -80,7 +53,7 @@ async function checkIn(scanned) {
   try {
     const { status, data } = await callDoor({ action: "scan", scanned });
     if (status === 401) {
-      forgetPassword();
+      window.organizerAuth.signOut();
       busy = false;
       showLogin(data.error);
     } else if (status !== 200) {
@@ -144,19 +117,19 @@ function renderMatches(matches) {
 
 $("login").addEventListener("submit", async (event) => {
   event.preventDefault();
-  savePassword($("password").value);
   try {
+    await window.organizerAuth.signIn($("email").value, $("password").value);
     const { status, data } = await callDoor({ action: "login" });
     if (status === 200) {
       $("password").value = "";
       openDesk();
     } else {
-      forgetPassword();
+      window.organizerAuth.signOut();
       showLogin(data.error);
     }
-  } catch {
-    forgetPassword();
-    showLogin(OFFLINE);
+  } catch (error) {
+    window.organizerAuth.signOut();
+    showLogin(error.status ? error.message : OFFLINE);
   }
 });
 
@@ -166,7 +139,7 @@ $("search").addEventListener("submit", async (event) => {
   try {
     const { status, data } = await callDoor({ action: "search", query: $("query").value });
     if (status === 401) {
-      forgetPassword();
+      window.organizerAuth.signOut();
       showLogin(data.error);
     } else if (status !== 200) {
       $("search-status").textContent = data.error;
@@ -188,8 +161,4 @@ $("next").addEventListener("click", () => {
   busy = false;
 });
 
-const saved = savedPassword();
-if (saved) {
-  password = saved;
-  openDesk();
-}
+if (window.organizerAuth.signedIn()) openDesk();

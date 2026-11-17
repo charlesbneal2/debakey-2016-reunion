@@ -625,3 +625,8 @@ img { max-width: 100%; height: auto; }
   .ticket .portrait:has(#qr:not([hidden])) { padding: 16px 16px 0; }
   .ticket .portrait:has(#qr:not([hidden])) h1 { margin: 16px -16px 0; }
 }
+
+/* Organizer list (admin.html) reuses the door desk; each buyer stacks name, email, note */
+.matches li.order { align-items: start; flex-direction: column; gap: 4px; }
+.matches li.order a { color: var(--ink); }
+.matches li.order small { text-align: left; }

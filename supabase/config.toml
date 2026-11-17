@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.signatures]
 verify_jwt = false
+
+[functions.invite-admin]
+verify_jwt = false

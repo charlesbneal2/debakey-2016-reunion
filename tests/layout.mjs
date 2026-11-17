@@ -311,6 +311,26 @@ await test("privacy page is linked and says what is collected and who to contact
 });
 
 const DOOR = "**/functions/v1/door";
+const AUTH = "**/auth/v1/**";
+
+// Fake Supabase Auth: "right" is the password, "tok" the access token it hands out.
+async function routeAuth(page) {
+  const calls = [];
+  await page.route(AUTH, (route) => {
+    const url = new URL(route.request().url());
+    const body = route.request().postDataJSON();
+    calls.push({ path: url.pathname, method: route.request().method(), body });
+    const session = { access_token: "tok", refresh_token: "ref", expires_in: 3600 };
+    if (url.pathname.endsWith("/token")) {
+      return body.password === "right" ? json(route, session) : json(route, { error_description: "Invalid login credentials" }, 400);
+    }
+    if (url.pathname.endsWith("/verify")) {
+      return body.token_hash === "good" ? json(route, session) : json(route, { msg: "Email link is invalid or has expired" }, 403);
+    }
+    return json(route, { id: "u1" }); // PUT /user
+  });
+  return calls;
+}
 const TICKET = "**/functions/v1/ticket*";
 const PNG = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
 
@@ -357,14 +377,14 @@ await test("unknown ticket shows not found and contact", async (open) => {
 
 await test("thanks, ticket, and door pages are not indexed or linked", async (open) => {
   const page = await open();
-  for (const path of ["thanks", "ticket", "door"]) {
+  for (const path of ["thanks", "ticket", "door", "admin"]) {
     await page.route(TICKET, (route) => json(route, { error: "Ticket not found." }, 404));
     await page.goto(`${BASE}/${path}`);
     assert.equal(await page.locator('meta[name="robots"]').getAttribute("content"), "noindex");
   }
   await page.goto(BASE);
   const linked = await page.locator("a").evaluateAll((links) => links.map((a) => new URL(a.href).pathname));
-  for (const path of ["/thanks", "/ticket", "/door"]) {
+  for (const path of ["/thanks", "/ticket", "/door", "/admin"]) {
     assert.equal(linked.includes(path), false, path);
   }
 });
@@ -372,10 +392,11 @@ await test("thanks, ticket, and door pages are not indexed or linked", async (op
 async function openDoor(open, scanResponse, options = {}) {
   const page = await open({ width: 360, height: 640, ...options });
   const posts = [];
+  await routeAuth(page);
   await page.route(DOOR, (route) => {
     const body = route.request().postDataJSON();
     posts.push(body);
-    if (body.password !== "right") return json(route, { error: "Wrong password." }, 401);
+    if (body.token !== "tok") return json(route, { error: "Sign in with an organizer account." }, 401);
     if (body.action === "login") return json(route, { ok: true });
     if (body.action === "search") {
       return json(route, {
@@ -392,7 +413,8 @@ async function openDoor(open, scanResponse, options = {}) {
 }
 
 async function login(page) {
-  await page.getByLabel("Door password").fill("right");
+  await page.getByLabel("Organizer email").fill("org@example.com");
+  await page.getByLabel("Password", { exact: true }).fill("right");
   await page.getByRole("button", { name: "Open check-in" }).click();
   await page.getByLabel("Find by name").waitFor();
 }
@@ -403,12 +425,21 @@ async function checkInFromSearch(page) {
   await page.getByRole("button", { name: "Check in" }).first().click();
 }
 
-await test("door requires password and shows error", async (open) => {
+await test("door requires organizer sign-in and shows error", async (open) => {
   const { page } = await openDoor(open, {});
   assert.equal(await page.getByLabel("Find by name").isVisible(), false);
-  await page.getByLabel("Door password").fill("wrong");
+  await page.getByLabel("Organizer email").fill("org@example.com");
+  await page.getByLabel("Password", { exact: true }).fill("wrong");
   await page.getByRole("button", { name: "Open check-in" }).click();
-  await page.getByText("Wrong password.").waitFor();
+  await page.getByText("Invalid login credentials").waitFor();
+});
+
+await test("door stays signed in across reloads and sends the access token", async (open) => {
+  const { page, posts } = await openDoor(open, {});
+  await login(page);
+  await page.reload();
+  await page.getByLabel("Find by name").waitFor();
+  assert.ok(posts.every((p) => p.token === "tok" && !("password" in p)));
 });
 
 await test("door search renders names literally and marks checked-in tickets", async (open) => {
@@ -477,6 +508,65 @@ await test("door network failure points staff to printed list", async (open) => 
   await page.getByLabel("Find by name").fill("jane");
   await page.getByRole("button", { name: "Search" }).click();
   await page.getByText("printed list").waitFor();
+  assert.deepEqual(page.errors, []);
+});
+
+const ORDERS = [
+  { buyer_name: "<b>Ana</b> Ruiz", email: "ana@example.com", guest_name: "Cy Lee", with_guest: true, status: "paid", created_at: "2026-11-10T18:00:00Z" },
+  { buyer_name: "Bo Lee", email: "bo.with.a.very.long.address@example-domain.com", guest_name: null, with_guest: false, status: "paid", created_at: "2026-11-11T18:00:00Z" },
+  { buyer_name: "Di Ng", email: "di@example.com", guest_name: null, with_guest: true, status: "refunded", created_at: "2026-11-12T18:00:00Z" },
+];
+
+async function openAdmin(open, path = "/admin", options = {}) {
+  const page = await open({ width: 360, height: 640, ...options });
+  const auth = await routeAuth(page);
+  await page.route(DOOR, (route) => {
+    const body = route.request().postDataJSON();
+    if (body.token !== "tok") return json(route, { error: "Sign in with an organizer account." }, 401);
+    return json(route, { orders: ORDERS });
+  });
+  await page.goto(`${BASE}${path}`);
+  return { page, auth };
+}
+
+await test("admin signs in and lists buyers with contact info", async (open) => {
+  for (const [width, height] of [[320, 568], [1280, 800]]) {
+    const { page } = await openAdmin(open, "/admin", { width, height });
+    await page.getByLabel("Email", { exact: true }).fill("org@example.com");
+    await page.getByLabel("Password", { exact: true }).fill("wrong");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.getByText("Invalid login credentials").waitFor();
+    await page.getByLabel("Password", { exact: true }).fill("right");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.getByText("2 classmates, 1 guests, 3 tickets.").waitFor();
+    await page.getByText("<b>Ana</b> Ruiz").waitFor();
+    assert.equal(await page.locator('a[href="mailto:ana@example.com"]').count(), 1);
+    await page.getByText("+ Cy Lee · bought Nov 10").waitFor();
+    await page.getByText("+ guest · bought Nov 12 · REFUNDED").waitFor();
+    assert.equal(await noOverflow(page), true);
+    await page.screenshot({ path: join(SHOTS, `admin-${width}.png`), fullPage: true });
+    await page.reload();
+    await page.getByText("3 tickets.").waitFor();
+    await page.getByRole("button", { name: "Sign out" }).click();
+    await page.getByRole("button", { name: "Sign in" }).waitFor();
+  }
+});
+
+await test("admin invite link sets a password once, then shows the list", async (open) => {
+  const { page, auth } = await openAdmin(open, "/admin?type=invite&token_hash=good");
+  await page.getByLabel("New password").fill("a-good-password");
+  await page.getByRole("button", { name: "Save password" }).click();
+  await page.getByText("3 tickets.").waitFor();
+  assert.deepEqual(auth.map((c) => [c.path.split("/").pop(), c.method]), [["verify", "POST"], ["user", "PUT"]]);
+  assert.deepEqual(auth[0].body, { token_hash: "good", type: "invite" });
+  assert.equal(new URL(page.url()).search, "", "one-time token removed from the address bar");
+});
+
+await test("admin expired link says to ask for a new one", async (open) => {
+  const { page } = await openAdmin(open, "/admin?type=invite&token_hash=used");
+  await page.getByLabel("New password").fill("a-good-password");
+  await page.getByRole("button", { name: "Save password" }).click();
+  await page.getByText("Ask for a new one").waitFor();
   assert.deepEqual(page.errors, []);
 });
 

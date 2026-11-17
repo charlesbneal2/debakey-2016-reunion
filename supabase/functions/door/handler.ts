@@ -1,4 +1,5 @@
 import { corsHeaders, json } from "../_shared/http.ts";
+import type { IsAdmin } from "../_shared/admin_auth.ts";
 import type { Store } from "../_shared/store.ts";
 import { ticketLabel } from "../_shared/tickets.ts";
 
@@ -12,16 +13,9 @@ export function extractToken(scanned: string): string {
   }
 }
 
-async function passwordMatches(given: string, expected: string): Promise<boolean> {
-  const digest = async (s: string) =>
-    new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)));
-  const [a, b] = await Promise.all([digest(given), digest(expected)]);
-  return a.reduce((diff, byte, i) => diff | (byte ^ b[i]), 0) === 0;
-}
-
 export async function handleDoor(
   req: Request,
-  deps: { store: Store; siteUrl: string; doorPassword: string },
+  deps: { store: Store; siteUrl: string; isAdmin: IsAdmin },
 ): Promise<Response> {
   const cors = corsHeaders(req.headers.get("origin"), deps.siteUrl);
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
@@ -36,14 +30,10 @@ export async function handleDoor(
   }
 
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
-    if (!(await deps.store.doorAuthAllowed(ip))) {
-      return json({ error: "Too many attempts. Wait 15 minutes." }, 429, cors);
-    }
-    const password = typeof body.password === "string" ? body.password : "";
-    if (!(await passwordMatches(password, deps.doorPassword))) {
-      await deps.store.doorAuthFailed(ip);
-      return json({ error: "Wrong password." }, 401, cors);
+    // ponytail: no failure rate limit here; Supabase Auth limits password sign-ins.
+    const token = typeof body.token === "string" ? body.token : "";
+    if (!(await deps.isAdmin(token))) {
+      return json({ error: "Sign in with an organizer account." }, 401, cors);
     }
 
     switch (body.action) {
@@ -86,6 +76,8 @@ export async function handleDoor(
           cors,
         );
       }
+      case "orders":
+        return json({ orders: await deps.store.adminOrders() }, 200, cors);
       default:
         return json({ error: "Bad request." }, 400, cors);
     }

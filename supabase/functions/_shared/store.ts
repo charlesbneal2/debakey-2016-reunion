@@ -50,6 +50,15 @@ export type TicketMatch = {
   checked_in_at: string | null;
 };
 
+export type AdminOrder = {
+  buyer_name: string;
+  email: string;
+  guest_name: string | null;
+  with_guest: boolean;
+  status: "paid" | "refunded";
+  created_at: string;
+};
+
 export type SignatureInput = { message: string; x: number; y: number; size: number };
 export type Signature = SignatureInput & { created_at: string };
 
@@ -78,8 +87,7 @@ export function createStore(rpc: Rpc) {
     getTicket: (token: string) => rpc("get_ticket", { p_token: token }) as Promise<TicketInfo | null>,
     checkInTicket: (token: string) => rpc("check_in_ticket", { p_token: token }) as Promise<CheckInResult>,
     searchTickets: (query: string) => rpc("search_tickets", { p_query: query }) as Promise<TicketMatch[]>,
-    doorAuthAllowed: (ip: string) => rpc("door_auth_allowed", { p_ip: ip }) as Promise<boolean>,
-    doorAuthFailed: (ip: string) => rpc("door_auth_failed", { p_ip: ip }) as Promise<boolean>,
+    adminOrders: () => rpc("admin_orders") as Promise<AdminOrder[]>,
     listSignatures: () => rpc("list_signatures") as Promise<Signature[]>,
     /** Resolves null when this ip hash is rate limited. */
     addSignature: (input: SignatureInput, ipHash: string) =>

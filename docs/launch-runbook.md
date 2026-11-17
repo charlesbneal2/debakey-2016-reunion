@@ -28,7 +28,7 @@ Do these in order. Stripe details are in `docs/stripe-setup.md`; do its steps 1-
 
 First do `docs/stripe-setup.md` steps 1-5 to get your Stripe values.
 
-Generate the door password with `openssl rand -hex 8`. Send it to door staff privately so they can paste it. Don't use a short or guessable password, because it unlocks every ticket.
+`ADMIN_EMAILS` is a comma-separated list of organizer emails. Only these accounts can open `/admin` (the ticket buyer list) and `/door` (check-in). The list stays in a secret because the repo is public.
 
 ```bash
 npx supabase secrets set \
@@ -36,7 +36,7 @@ npx supabase secrets set \
   STRIPE_WEBHOOK_SECRET=whsec_... \
   STRIPE_PRICE_ID=price_... \
   RESEND_API_KEY=re_... \
-  DOOR_PASSWORD='YOUR_GENERATED_PASSWORD' \
+  ADMIN_EMAILS='first@example.com,second@example.com' \
   REPLY_TO_EMAIL=you@example.com \
   SITE_URL=http://localhost:8000
 
@@ -44,7 +44,7 @@ npx supabase functions deploy --use-api
 npx supabase functions list
 ```
 
-The list must show `create-checkout`, `stripe-webhook`, `guest-list`, `ticket`, and `door`.
+The list must show `create-checkout`, `stripe-webhook`, `guest-list`, `ticket`, `door`, `signatures`, and `invite-admin`.
 
 Smoke test before going further. This must print `{"guests":[]}`:
 
@@ -74,13 +74,6 @@ Open http://localhost:8000 in your Windows browser. Every item must pass.
 - [ ] Try a declined card: `4000 0000 0000 9995`. No tickets or email.
 - [ ] Buy **Just me** with a name containing HTML and emoji, such as `<b>Jo</b> 🎉`. It displays literally in the email and at the door.
 - [ ] Practice the mistyped-email fix below. The same QR codes arrive at the new address.
-- [ ] Send a forged door request, then check **Edge Functions > door > Logs** or `door_failures` to see which IP was recorded. If the forged value was recorded, password limiting can be bypassed, so fix that before launch:
-
-  ```bash
-  curl -X POST https://YOUR_PROJECT_REF.supabase.co/functions/v1/door \
-    -H 'x-forwarded-for: 203.0.113.99' -d '{"password":"wrong","action":"login"}'
-  ```
-
 Phone cameras need HTTPS, so section 5 repeats the scan on a real phone after deployment.
 
 ## 5. GitHub Pages and domain
@@ -149,7 +142,7 @@ The page is now public, but it only takes test cards until you switch Stripe to 
    order by name;
    ```
 
-2. Send door staff `https://debakey2016reunion.com/door` and the password. Have them test it before doors open.
+2. Door staff sign in at `https://debakey2016reunion.com/door` with their organizer accounts. Have them test it before doors open.
 3. If signal fails, check people against the printed list by name. The site won't record those check-ins.
 4. Sales close automatically at 9 PM Central.
 
@@ -193,21 +186,16 @@ update orders set show_on_list = false where id = 'ORDER_ID';
 
 Open the webhook in Stripe Workbench and check **Event deliveries** for errors. Check logs under **Edge Functions > stripe-webhook** in Supabase. After fixing the cause, click **Resend** on the event. The order and tickets will be created without any double charge.
 
-### Change the door password
+### Add an organizer or reset a password
+
+Add the email to `ADMIN_EMAILS` (`npx supabase secrets set ADMIN_EMAILS='a@x.com,b@y.com'`), then email them a link. New accounts get a set-password link and existing accounts get a reset link. The link works once and expires after 24 hours.
 
 ```bash
-npx supabase secrets set DOOR_PASSWORD='new-password'
+curl -X POST https://uzrskapqqhjwlfreacwn.supabase.co/functions/v1/invite-admin \
+  -H "authorization: Bearer $SERVICE_ROLE_KEY" -d '{"email":"organizer@example.com"}'
 ```
 
-Staff then log in again.
-
-### Door says "Too many attempts"
-
-Wait 15 minutes, or clear the failures:
-
-```sql
-delete from door_failures;
-```
+Use the legacy `service_role` key from **Project Settings > API Keys**. To remove an organizer, take them out of `ADMIN_EMAILS`.
 
 ## After the reunion
 

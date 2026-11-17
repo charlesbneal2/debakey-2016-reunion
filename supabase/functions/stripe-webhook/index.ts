@@ -1,25 +1,8 @@
 import Stripe from "npm:stripe@17";
 import { json } from "../_shared/http.ts";
 import { liveStore } from "../_shared/live_store.ts";
-import type { TicketEmail } from "../_shared/tickets.ts";
+import { sendEmail } from "../_shared/email.ts";
 import { handleStripeEvent, verifyEvent } from "./handler.ts";
-
-async function sendEmail(to: string, email: TicketEmail) {
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${Deno.env.get("RESEND_API_KEY")}`,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "DeBakey Reunion <tickets@debakey2016reunion.com>",
-      to,
-      reply_to: Deno.env.get("REPLY_TO_EMAIL"),
-      ...email,
-    }),
-  });
-  if (!response.ok) throw new Error(`Resend returned ${response.status}: ${await response.text()}`);
-}
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
   httpClient: Stripe.createFetchHttpClient(),

@@ -4,14 +4,14 @@ import { createStore } from "../functions/_shared/store.ts";
 import { extractToken, handleDoor } from "../functions/door/handler.ts";
 
 const SITE = "https://debakey2016reunion.com";
-const PASSWORD = "door-secret";
+const TOKEN = "admin-access-token";
 
 async function setup(): Promise<{
   rpc: Rpc;
   door(body: unknown, ip?: string): Promise<Response>;
 }> {
   const { rpc } = await newDb();
-  const deps = { store: createStore(rpc), siteUrl: SITE, doorPassword: PASSWORD };
+  const deps = { store: createStore(rpc), siteUrl: SITE, isAdmin: (token: string) => Promise.resolve(token === TOKEN) };
   return {
     rpc,
     door: (body, ip = "1.2.3.4") =>
@@ -26,33 +26,45 @@ async function setup(): Promise<{
   };
 }
 
-const auth = (body: Record<string, unknown>) => ({ password: PASSWORD, ...body });
+const auth = (body: Record<string, unknown>) => ({ token: TOKEN, ...body });
 
-Deno.test("login succeeds with correct password", async () => {
+Deno.test("login succeeds with an admin token", async () => {
   const { door } = await setup();
   const res = await door(auth({ action: "login" }));
   assertEquals(res.status, 200);
   assertEquals(await res.json(), { ok: true });
 });
 
-Deno.test("wrong password returns 401 and records failure", async () => {
-  const { door, rpc } = await setup();
-  const res = await door({ password: "wrong", action: "login" });
-  assertEquals(res.status, 401);
-  assertEquals((await res.json()).error, "Wrong password.");
-  for (let i = 0; i < 18; i++) await rpc("door_auth_failed", { p_ip: "1.2.3.4" });
-  assertEquals(await rpc("door_auth_allowed", { p_ip: "1.2.3.4" }), true);
-  await rpc("door_auth_failed", { p_ip: "1.2.3.4" });
-  assertEquals(await rpc("door_auth_allowed", { p_ip: "1.2.3.4" }), false);
+Deno.test("missing or non-admin token returns 401", async () => {
+  const { door } = await setup();
+  for (const body of [{ action: "login" }, { token: "someone-else", action: "scan", scanned: "x" }, { token: 7, action: "orders" }]) {
+    const res = await door(body);
+    assertEquals(res.status, 401);
+    assertEquals((await res.json()).error, "Sign in with an organizer account.");
+  }
 });
 
-Deno.test("after 20 failures even correct password returns 429", async () => {
-  const { door } = await setup();
-  for (let i = 0; i < 20; i++) await door({ password: "wrong", action: "login" });
-  const res = await door(auth({ action: "login" }));
-  assertEquals(res.status, 429);
-  assertEquals((await res.json()).error, "Too many attempts. Wait 15 minutes.");
-  assertEquals((await door(auth({ action: "login" }), "9.9.9.9")).status, 200);
+Deno.test("orders lists every buyer with contact info, guest, and refund status", async () => {
+  const { door, rpc } = await setup();
+  await rpc("record_paid_order", orderArgs({ p_buyer_name: "Ana Ruiz", p_email: "ana@example.com" }));
+  const refunded = orderArgs({
+    p_buyer_name: "Bo Lee",
+    p_email: "bo@example.com",
+    p_with_guest: true,
+    p_guest_name: "Cy Lee",
+    p_guest_token: "g-bo",
+  });
+  await rpc("record_paid_order", refunded);
+  await rpc("mark_order_refunded", { p_payment_intent: refunded.p_payment_intent });
+
+  const { orders } = await (await door(auth({ action: "orders" }))).json();
+  assertEquals(
+    orders.map(({ created_at, ...rest }: { created_at: string }) => (assertEquals(typeof created_at, "string"), rest)),
+    [
+      { buyer_name: "Ana Ruiz", email: "ana@example.com", guest_name: null, with_guest: false, status: "paid" },
+      { buyer_name: "Bo Lee", email: "bo@example.com", guest_name: "Cy Lee", with_guest: true, status: "refunded" },
+    ],
+  );
 });
 
 Deno.test("extractToken takes t from ticket URL or raw token", () => {
@@ -94,7 +106,7 @@ Deno.test("refunded ticket gives voided", async () => {
   assertEquals(body.result, "voided");
 });
 
-Deno.test("search returns label, token, and checked-in state, requiring password", async () => {
+Deno.test("search returns label, token, and checked-in state, requiring admin token", async () => {
   const { door, rpc } = await setup();
   const args = orderArgs();
   await rpc("record_paid_order", args);
@@ -105,7 +117,7 @@ Deno.test("search returns label, token, and checked-in state, requiring password
   assertEquals(matches[0].label, "Jane Doe");
   assertEquals(matches[0].token, args.p_classmate_token);
   assertEquals(typeof matches[0].checked_in_at, "string");
-  assertEquals((await door({ password: "wrong", action: "search", query: "jane" })).status, 401);
+  assertEquals((await door({ token: "wrong", action: "search", query: "jane" })).status, 401);
 });
 
 Deno.test("search with non-string query returns no matches", async () => {

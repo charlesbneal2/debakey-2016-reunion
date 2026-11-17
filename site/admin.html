@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Organizers | DeBakey Reunion</title>
+  <link rel="icon" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Exo+2:ital,wght@0,700;0,800;1,800;1,900&family=Josefin+Sans:wght@300;400;600&display=swap">
+  <link rel="stylesheet" href="styles.css?v=10">
+</head>
+<body class="door y16 charcoal">
+  <form id="set-password" class="dpanel" hidden>
+    <h1>Set your password</h1>
+    <label class="field" for="new-password">New password
+      <input id="new-password" type="password" autocomplete="new-password" minlength="8" required>
+    </label>
+    <button class="button" type="submit">Save password</button>
+    <p id="set-status" class="form-status" role="alert"></p>
+  </form>
+
+  <form id="login" class="dpanel" hidden>
+    <h1>Organizers</h1>
+    <label class="field" for="email">Email
+      <input id="email" type="email" autocomplete="username" required>
+    </label>
+    <label class="field" for="password">Password
+      <input id="password" type="password" autocomplete="current-password" required>
+    </label>
+    <button class="button" type="submit">Sign in</button>
+    <p id="login-status" class="form-status" role="alert"></p>
+  </form>
+
+  <main id="desk" class="door-desk" hidden>
+    <h1>Ticket buyers</h1>
+    <p id="summary" class="camera-status" role="status"></p>
+    <ul id="orders" class="matches"></ul>
+    <a class="button button-light" href="door.html">Door check-in</a>
+    <button id="sign-out" class="button button-light" type="button">Sign out</button>
+  </main>
+
+  <script src="config.js?v=2"></script>
+  <script src="auth.js?v=1"></script>
+  <script src="admin.js?v=1"></script>
+</body>
+</html>

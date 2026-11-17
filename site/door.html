@@ -9,12 +9,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Exo+2:ital,wght@0,700;0,800;1,800;1,900&family=Josefin+Sans:wght@300;400;600&display=swap">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body class="door y16 charcoal">
   <form id="login" class="dpanel">
     <h1>Door check-in</h1>
-    <label class="field" for="password">Door password
+    <label class="field" for="email">Organizer email
+      <input id="email" type="email" autocomplete="username" required>
+    </label>
+    <label class="field" for="password">Password
       <input id="password" type="password" autocomplete="current-password" required>
     </label>
     <button class="button" type="submit">Open check-in</button>
@@ -42,8 +45,9 @@
     <button id="next" class="button button-light" type="button">Next</button>
   </div>
 
-  <script src="config.js"></script>
+  <script src="config.js?v=2"></script>
+  <script src="auth.js?v=1"></script>
   <script src="vendor/html5-qrcode.min.js"></script>
-  <script src="door.js?v=2"></script>
+  <script src="door.js?v=3"></script>
 </body>
 </html>
