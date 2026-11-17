@@ -192,10 +192,10 @@ Add the email to `ADMIN_EMAILS` (`npx supabase secrets set ADMIN_EMAILS='a@x.com
 
 ```bash
 curl -X POST https://uzrskapqqhjwlfreacwn.supabase.co/functions/v1/invite-admin \
-  -H "authorization: Bearer $SERVICE_ROLE_KEY" -d '{"email":"organizer@example.com"}'
+  -H "authorization: Bearer $SECRET_KEY" -d '{"email":"organizer@example.com"}'
 ```
 
-Use the legacy `service_role` key from **Project Settings > API Keys**. To remove an organizer, take them out of `ADMIN_EMAILS`.
+Use the `sb_secret_...` secret key from **Project Settings > API Keys** (the value the functions see as `SUPABASE_SERVICE_ROLE_KEY`). To remove an organizer, take them out of `ADMIN_EMAILS`.
 
 ## After the reunion
 
