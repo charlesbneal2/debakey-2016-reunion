@@ -232,7 +232,7 @@ img { max-width: 100%; height: auto; }
 .yb-book .page-paper { background: #fffdf6; cursor: zoom-in; }
 .sheet-mini { height: 1400px; left: 0; pointer-events: none; position: absolute; top: 0; transform-origin: 0 0; width: 2100px; }
 .sheet-title { height: 84px; left: 525px; pointer-events: none; position: absolute; top: 60px; transform: translateX(-50%); } /* centred on the left half (1050 units) */
-.signature { color: var(--navy); font-family: "Caveat", cursive; line-height: 1.15; max-width: 600px; overflow-wrap: anywhere; position: absolute; white-space: pre-wrap; }
+.signature { color: var(--navy); font-family: "Caveat", cursive; line-height: 1.15; max-width: 420px; overflow-wrap: anywhere; padding: 8px 12px; position: absolute; white-space: pre-wrap; }
 .signer { background: inherit; display: flex; flex-direction: column; inset: 0; position: fixed; z-index: 20; }
 .signer-bar { align-items: center; display: flex; gap: 8px; justify-content: space-between; padding: 12px 14px; }
 .yearbook-page .signer .button { gap: 6px; }
@@ -243,7 +243,7 @@ img { max-width: 100%; height: auto; }
 .yearbook-page .signer-tools :focus-visible { --focus: var(--ink); box-shadow: 0 0 0 6px #fff; }
 .signer-viewport { cursor: crosshair; flex: 1; min-height: 0; overflow: hidden; position: relative; touch-action: none; }
 .sheet { background: #fffdf6 linear-gradient(90deg, transparent 1046px, rgb(0 0 0 / 6%) 1050px, transparent 1054px); box-shadow: 0 30px 80px rgb(0 0 0 / 60%); height: 1400px; left: 0; position: absolute; top: 0; width: 2100px; }
-.write-box { background: rgb(255 255 255 / 70%); border: 2px dashed var(--royal); border-radius: 6px; color: var(--navy); font-family: "Caveat", cursive; line-height: 1.15; overflow: hidden; padding: 0; position: absolute; resize: none; width: 600px; }
+.write-box { background: rgb(255 255 255 / 70%); border: 2px dashed var(--royal); border-radius: 6px; color: var(--navy); font-family: "Caveat", cursive; line-height: 1.15; min-height: 315px; overflow: hidden; padding: 6px 10px; /* + 2px border = .signature padding */ position: absolute; resize: none; width: 420px; }
 .yearbook-page .write-box:focus { outline: none; }
 .yearbook-page .write-box:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; } /* after the rule above, same specificity */
 .signer-status { bottom: 76px; color: #fff; font: 600 15px/1 var(--jos); isolation: isolate; left: 50%; margin: 0; padding: 14px 30px 11px; position: absolute; transform: translateX(-50%); white-space: nowrap; }

@@ -124,7 +124,8 @@
   // ---- Signing sheet: one big zoomable sheet, messages pinned where people tapped. ----
   const SHEET_W = 2100;
   const SHEET_H = 1400;
-  const BOX_W = 600; // max message width, sheet units
+  const BOX_W = 420; // max message width, sheet units (matches .signature max-width)
+  const BOX_H = BOX_W * 0.75; // write box min height: a squarish card, not a one-line strip
   const SIZE = 24; // one text size for everyone; the API still accepts 16/24/36/54/80
   const signer = document.getElementById("signer");
   const viewport = document.getElementById("signer-viewport");
@@ -212,7 +213,7 @@
   function startWriting(sheetX, sheetY) {
     // Keep the whole box on the sheet.
     const x = Math.max(0, Math.min(SHEET_W - BOX_W, sheetX));
-    const y = Math.max(0, Math.min(SHEET_H * 0.97, sheetY));
+    const y = Math.max(0, Math.min(SHEET_H - BOX_H, sheetY));
     if (!box) {
       box = document.createElement("textarea");
       box.id = "write-box";
@@ -230,7 +231,10 @@
     grow();
     tools.hidden = false;
     showStatus("");
-    centreOn(x + BOX_W / 2, y + SIZE);
+    // Zoom so the whole box fits across the screen with a margin, its top just under the bar
+    // (keeps it above a phone keyboard).
+    const scale = Math.min(1, (viewport.clientWidth - 48) / BOX_W);
+    centreOn(x + BOX_W / 2, y - 24 / scale + viewport.clientHeight / 2 / scale, scale);
     box.focus({ preventScroll: true });
   }
 

@@ -639,7 +639,14 @@ await test("tap opens write box zoomed in at that spot", async (open) => {
   await tapToWrite(page);
   assert.equal(await page.evaluate(() => document.activeElement.id), "write-box");
   // Panzoom applies transforms on the next animation frame.
-  await page.waitForFunction(() => document.querySelector("#sheet").getBoundingClientRect().width >= 2100 * 0.95);
+  // Zoom fits the 420-unit box across the viewport with a 24px margin each side (capped at 100%).
+  await page.waitForFunction(() => {
+    const scale = Math.min(1, (document.querySelector("#signer-viewport").clientWidth - 48) / 420);
+    return document.querySelector("#sheet").getBoundingClientRect().width >= 2100 * scale * 0.95;
+  });
+  const box = await page.locator("#write-box").boundingBox();
+  const vw = page.viewportSize().width;
+  assert.ok(box.x >= 16 && box.x + box.width <= vw - 16, `write box inside screen: ${JSON.stringify(box)}`);
 });
 
 await test("posting sends message, position and size", async (open) => {
@@ -738,7 +745,8 @@ await test("tap near edge keeps box on sheet", async (open) => {
   await page.keyboard.type("edge");
   await page.locator("#write-post").click();
   await page.locator("#sheet .signature").filter({ hasText: "edge" }).waitFor({ state: "attached" });
-  assert.ok(posted[0].x <= 0.72 && posted[0].y <= 0.97, JSON.stringify(posted[0]));
+  // Box is 420 x 315 sheet units on a 2100 x 1400 sheet.
+  assert.ok(posted[0].x <= 0.8 && posted[0].y <= 0.775, JSON.stringify(posted[0]));
 });
 
 await test("typing in write box does not flip", async (open) => {
